@@ -13,15 +13,12 @@ import logo from '../assests/polyakeynez.png'
 const theme = createTheme({
     palette: {
         primary: {
-            // Purple and green play nicely together.
             main: '#ffffff',
         },
         secondary: {
-            // This is green.A700 as hex.
             main: '#ffffff',
         },
         error: {
-            // Red.A400 as hex.
             main: '#ff0000',
         }
 
