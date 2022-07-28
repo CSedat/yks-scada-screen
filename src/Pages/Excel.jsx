@@ -1,4 +1,6 @@
 import React, { useState } from 'react'
+import axios from "axios";
+import moment from 'moment';
 import { DataGrid } from '@mui/x-data-grid';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
@@ -34,16 +36,16 @@ export default function SaveData() {
     };
 
     return (
-        <div className=' h-1/2  absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 '>
+        <div className=' h-1/2  absolute top-2 left-2 '>
             <ThemeProvider theme={theme}>
                 <div className='w-full p-2 bg-gray-600 rounded grid grid-cols-3'>
                     <div>
-                        <TextField id="outlined-basic" label="Yer Kantarı" variant="outlined" size='small' color="secondary" sx={{ input: { color: '#ffffff' }, width: '75%' }} focused
+                        <TextField id="outlined-basic" label="Yer Kantarı" variant="outlined" size='small' color="secondary" type={'number'} sx={{ input: { color: '#ffffff' }, width: '75%' }} focused
                             onChange={handleChangeYerkantar}
                         />
                     </div>
                     <div>
-                        <TextField id="outlined-basic" label="Dara" variant="outlined" size='small' color="secondary" sx={{ input: { color: '#ffffff' }, width: '75%' }} focused
+                        <TextField id="outlined-basic" label="Dara" variant="outlined" size='small' color="secondary" type={'number'} sx={{ input: { color: '#ffffff' }, width: '75%' }} focused
                             onChange={handleChangeDara}
                         />
                     </div>
@@ -54,13 +56,16 @@ export default function SaveData() {
 
                 </div>
 
-                <div style={{ height: '100%', width: '100%' }}>
+                <div style={{ height: 400 }}>
                     <DataGrid
-                        rows={rows}
                         columns={columns}
+                        rows={rows}
+                        rowsPerPageOptions={[]}
+                        hideFooter
                         experimentalFeatures={{ newEditingApi: true }}
                         rowHeight={35}
                         headerHeight={35}
+                        
                         // onRowClick={(e, row) => {
                         //         console.log(row);
                         //     }
@@ -71,6 +76,16 @@ export default function SaveData() {
                         onRowEditStart={(e, row) => {
                             console.log(row);
                         }}
+                        sx={{
+                            color: '#ffffff',
+                            
+                          boxShadow: 4,
+                          border: 1,
+                          borderColor: '#ffffff',
+                          '& .MuiDataGrid-cell:hover': {
+                            color: 'yellow',
+                          },
+                        }}
                     />
                 </div>
             </ThemeProvider>
@@ -79,58 +94,51 @@ export default function SaveData() {
 }
 
 const columns = [
-    { field: 'name', headerName: 'Name', editable: true, headerAlign: 'center', },
-    { field: 'age', headerName: 'Age', type: 'number', editable: true, headerAlign: 'center', },
     {
-        field: 'dateCreated',
-        headerName: 'Date Created',
+        field: 'kantar',
+        headerName: 'Yer Kantarı',
+        type: 'number',
+        editable: true,
+        headerAlign: 'center',
+    },
+    {
+        field: 'dara',
+        headerName: 'Dara',
+        type: 'number',
+        editable: true,
+        headerAlign: 'center',
+    },
+    {
+        field: 'date',
+        headerName: 'Kayıt Tarihi',
         type: 'date',
         headerAlign: 'center',
         editable: true,
-    },
-    {
-        field: 'lastLogin',
-        headerName: 'Last Login',
-        type: 'dateTime',
-        headerAlign: 'center',
-        editable: true,
-    },
+    }
 ];
 
-const rows = [
-    {
-        id: 1,
-        name: randomTraderName(),
-        age: Math.floor(Math.random() * 100),
-        dateCreated: randomCreatedDate(),
-        lastLogin: randomUpdatedDate(),
-    },
-    {
-        id: 2,
-        name: randomTraderName(),
-        age: Math.floor(Math.random() * 100),
-        dateCreated: randomCreatedDate(),
-        lastLogin: randomUpdatedDate(),
-    },
-    {
-        id: 3,
-        name: randomTraderName(),
-        age: Math.floor(Math.random() * 100),
-        dateCreated: randomCreatedDate(),
-        lastLogin: randomUpdatedDate(),
-    },
-    {
-        id: 4,
-        name: randomTraderName(),
-        age: Math.floor(Math.random() * 100),
-        dateCreated: randomCreatedDate(),
-        lastLogin: randomUpdatedDate(),
-    },
-    {
-        id: 5,
-        name: randomTraderName(),
-        age: Math.floor(Math.random() * 100),
-        dateCreated: randomCreatedDate(),
-        lastLogin: randomUpdatedDate(),
-    },
-];
+axios.get('http://127.0.0.1:8001/getData').then(response => {
+    let jsondata = response.data;
+    let rows = [];
+    for (let i = 0; i < jsondata.length; i++) {
+        rows.push({
+            id: i,
+            kantar: jsondata[i].name,
+            dara: jsondata[i].age,
+            date: jsondata[i].date,
+        });
+        
+    }
+    console.log(rows);
+});
+
+const rows = [];
+
+function GetLastID() {
+    axios.get('http://127.0.0.1:8001/getData').then(response => {
+    let jsondata = response.data;
+        let newID = jsondata[jsondata.length - 1].id + 1;
+        return newID;
+    });
+}
+
