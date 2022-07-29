@@ -5,11 +5,7 @@ import { DataGrid } from '@mui/x-data-grid';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import {
-    randomCreatedDate,
-    randomTraderName,
-    randomUpdatedDate,
-} from '@mui/x-data-grid-generator';
+
 const theme = createTheme({
     palette: {
         primary: {
@@ -35,6 +31,33 @@ export default function SaveData() {
         setDara(event.target.value);
     };
 
+    function getNewID() {
+        axios.get('http://127.0.0.1:8001/getData').then(response => {
+            let jsondata = response.data;
+            let newID = jsondata.splice(0)[0].id + 1;
+            console.log('id:' + newID);
+            return newID;
+        });
+    }
+
+    function saveData() {
+        let newID = getNewID();
+        moment.locale('tr');
+        setTimeout(() => {
+
+            axios({
+                method: 'post',
+                url: 'http://127.0.0.1:8001/saveData',
+                data: {
+                    id: newID,
+                    yerkantar: yerkantar,
+                    dara: dara,
+                    date: moment().format('DD/MM/YYYY - H:MM:SS')
+                }
+              });
+        }, 1000);
+    };  
+
     return (
         <div className=' h-1/2  absolute top-2 left-2 '>
             <ThemeProvider theme={theme}>
@@ -50,7 +73,7 @@ export default function SaveData() {
                         />
                     </div>
                     <Button style={{ width: '75%' }} variant="contained" color="success" onClick={() => {
-                        alert(yerkantar + dara);
+                        saveData()
                     }}
                     >Kaydet</Button>
 
@@ -100,10 +123,18 @@ const columns = [
         type: 'number',
         editable: true,
         headerAlign: 'center',
+        
     },
     {
         field: 'dara',
         headerName: 'Dara',
+        type: 'number',
+        editable: true,
+        headerAlign: 'center',
+    },
+    {
+        field: 'net',
+        headerName: 'Net',
         type: 'number',
         editable: true,
         headerAlign: 'center',
@@ -116,29 +147,18 @@ const columns = [
         editable: true,
     }
 ];
-
+const rows = [];
 axios.get('http://127.0.0.1:8001/getData').then(response => {
     let jsondata = response.data;
-    let rows = [];
     for (let i = 0; i < jsondata.length; i++) {
         rows.push({
             id: i,
-            kantar: jsondata[i].name,
-            dara: jsondata[i].age,
+            kantar: jsondata[i].kantar,
+            dara: jsondata[i].dara,
+            net: jsondata[i].dara-jsondata[i].kantar,
             date: jsondata[i].date,
         });
-        
     }
-    console.log(rows);
 });
 
-const rows = [];
-
-function GetLastID() {
-    axios.get('http://127.0.0.1:8001/getData').then(response => {
-    let jsondata = response.data;
-        let newID = jsondata[jsondata.length - 1].id + 1;
-        return newID;
-    });
-}
 

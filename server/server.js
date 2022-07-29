@@ -29,8 +29,9 @@ app.get("/", function (req, res) {
   console.log(req.query);
 });
 
-app.get("/saveData", function (req, res) {
-  res.sendFile("./data.json", { root: __dirname });
+app.post("/saveData", function (req, res) {
+  console.log(req.body);
+  res.end()
 });
 
 app.get("/getData", function (req, res) {

@@ -1,32 +1,32 @@
 [
     {
         "id": 5,
-        "kantar": 21,
-        "dara": 32,
+        "kantar": 23,
+        "dara": 34,
         "date": "2020-01-05"
     },
     {
         "id": 4,
-        "kantar": 21,
-        "dara": 32,
+        "kantar": 32,
+        "dara": 42,
         "date": "2020-01-04"
     },
     {
         "id": 3,
-        "kantar": 21,
-        "dara": 32,
+        "kantar": 20,
+        "dara": 36,
         "date": "2020-01-03"
     },
     {
         "id": 2,
-        "kantar": 21,
-        "dara": 32,
+        "kantar": 17,
+        "dara": 38,
         "date": "2020-01-02"
     },
     {
         "id": 1,
-        "kantar": 21,
-        "dara": 32,
+        "kantar": 17,
+        "dara": 40,
         "date": "2020-01-01"
     }
 ]
