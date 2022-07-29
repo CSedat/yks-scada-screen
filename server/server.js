@@ -31,9 +31,24 @@ app.get("/", function (req, res) {
 
 app.post("/saveData", function (req, res) {
   console.log(req.body);
-  res.end()
+  var data = fs.readFileSync(`./data/${req.body.urun}.json`);
+  var json = JSON.parse(data);
+  json.unshift(req.body);
+  fs.writeFileSync(`./data/${req.body.urun}.json`, JSON.stringify(json));
+  res.send("ok");
+  console.log(json);
+  res.end();
 });
 
-app.get("/getData", function (req, res) {
-  res.sendFile("./data.json", { root: __dirname });
+app.get("/getceviz", function (req, res) {
+  res.sendFile("./data/ceviz.json", { root: __dirname });
+});
+app.get("/getfindik", function (req, res) {
+  res.sendFile("./data/findik.json", { root: __dirname });
+});
+app.get("/gettoz", function (req, res) {
+  res.sendFile("./data/toz.json", { root: __dirname });
+});
+app.get("/getaraurun", function (req, res) {
+  res.sendFile("./data/araurun.json", { root: __dirname });
 });
