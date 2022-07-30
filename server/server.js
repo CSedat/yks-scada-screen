@@ -36,7 +36,22 @@ app.post("/saveData", function (req, res) {
   json.unshift(req.body);
   fs.writeFileSync(`./data/${req.body.urun}.json`, JSON.stringify(json));
   res.send("ok");
-  console.log(json);
+  res.end();
+});
+
+app.post("/deleteData", function (req, res) {
+  console.log(req.body);
+  var data = fs.readFileSync(`./data/${req.body.urun}.json`);
+  var json = JSON.parse(data);
+  
+  for (let i = 0; i < json.length; i++) {
+    const element = json[i];
+    if (element.id == req.body.id) {
+      json.splice(i, 1);
+    }
+  }
+  fs.writeFileSync(`./data/${req.body.urun}.json`, JSON.stringify(json));
+  res.send("ok");
   res.end();
 });
 

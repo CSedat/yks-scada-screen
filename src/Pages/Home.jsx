@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 import Switch from '@mui/material/Switch';
@@ -6,6 +6,9 @@ import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 import Alert from '@mui/material/Alert';
 import AlertTitle from '@mui/material/AlertTitle';
+import PropTypes from 'prop-types';
+import LinearProgress from '@mui/material/LinearProgress';
+import Box from '@mui/material/Box';
 import { FaBell } from 'react-icons/fa';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import logo from '../assests/polyakeynez.png'
@@ -26,7 +29,10 @@ const theme = createTheme({
 });
 
 function Home() {
-
+    const [araurunseviye, setAraurunseviye] = useState(10);
+    const [tozseviye, setTozseviye] = useState(20);
+    const [findikseviye, setFindikseviye] = useState(30);
+    const [cevizseviye, setCevizseviye] = useState(40);
     const [bk1, set1] = useState(false)
     const [bk2, set2] = useState(false)
     const [bk3, set3] = useState(false)
@@ -36,11 +42,22 @@ function Home() {
     const updatebk3 = () => set3(!bk3)
     const updatebk4 = () => set4(!bk4)
 
-
+    useEffect(() => {
+        const timer = setInterval(() => {
+            setAraurunseviye((prevProgress) => (prevProgress >= 100 ? 1 : prevProgress + 1));
+            setTozseviye((prevProgress) => (prevProgress >= 100 ? 1 : prevProgress + 1));
+            setFindikseviye((prevProgress) => (prevProgress >= 100 ? 1 : prevProgress + 1));
+            setCevizseviye((prevProgress) => (prevProgress >= 100 ? 1 : prevProgress + 1));
+        }, 200);
+        return () => {
+          clearInterval(timer);
+        };
+    }, []);
     return (
         <div className='text-white text-center gap-4 place-items-stretch ' >
             <div className='absolute rounded top-40 left-1/2 transform -translate-x-1/2 -translate-y-1/2 h-56 w-96'>
                 <img src={logo} alt="" />
+                
             </div>
             <Stack className='absolute top-0 left-0 w-1/4 h-96  m-2'>
                 <div className='bg-gray-300 rounded max-h-16 text-black justify-center items-center text-center'>
@@ -51,6 +68,9 @@ function Home() {
                         <Typography>Manuel</Typography>
                         <h3 className='absolute right-0 m-2 p-1 bg-yellow-500  rounded cursor-pointer flex justify-center items-center w-28 active:bg-yellow-300'><FaBell /> UYARI</h3>
                     </div>
+                    <Box sx={{ width: '100%' }}>
+                      <LinearProgressWithLabel value={araurunseviye} />
+                    </Box>
                     {bk1 ? <Manual id='1' /> : <Auto id='1' />}
                 </div>
             </Stack>
@@ -63,6 +83,9 @@ function Home() {
                         <Typography>Manuel</Typography>
                         <h3 className='absolute right-0 m-2 p-1 bg-yellow-500  rounded cursor-pointer flex justify-center items-center w-28 active:bg-yellow-300'><FaBell /> UYARI</h3>
                     </div>
+                    <Box sx={{ width: '100%' }}>
+                      <LinearProgressWithLabel value={tozseviye} />
+                    </Box>
                     {bk2 ? <Manual id='2' /> : <Auto id='2' />}
                 </div>
             </Stack>
@@ -75,6 +98,9 @@ function Home() {
                         <Typography>Manuel</Typography>
                         <h3 className='absolute right-0 m-2 p-1 bg-yellow-500  rounded cursor-pointer flex justify-center items-center w-28 active:bg-yellow-300'><FaBell /> UYARI</h3>
                     </div>
+                    <Box sx={{ width: '100%' }}>
+                      <LinearProgressWithLabel value={findikseviye} />
+                    </Box>
                     {bk3 ? <Manual id='3' /> : <Auto id='3' />}
                 </div>
             </Stack>
@@ -87,6 +113,9 @@ function Home() {
                         <Typography>Manuel</Typography>
                         <h3 className='absolute right-0 m-2 p-1 bg-yellow-500  rounded cursor-pointer flex justify-center items-center w-28 active:bg-yellow-300'><FaBell /> UYARI</h3>
                     </div>
+                    <Box sx={{ width: '100%' }}>
+                      <LinearProgressWithLabel value={cevizseviye} />
+                    </Box>
                     {bk4 ? <Manual id='4' /> : <Auto id='4' />}
                 </div>
             </Stack>
@@ -138,7 +167,6 @@ function Auto(props) {
     )
 }
 
-
 function Manual(props) {
     console.log(props.id)
     return (
@@ -153,7 +181,7 @@ function Manual(props) {
                     </div>
                 </div>
             </ThemeProvider>
-            <div className=' p-1 m-1 bg-gray-400 rounded text-black'>
+            <div className=' p-1 m-1 bg-gray-300 rounded text-black'>
                 <h1 className=' bg-gray-500 rounded text-white'>DURUM & KONTROL</h1>
                 <div className=' m-1 p-1  grid grid-cols-2 gap-4 place-items-stretch  '>
                     <Button variant="contained" color="success" >Bant Start</Button>
@@ -165,6 +193,30 @@ function Manual(props) {
         </div>
     )
 }
+
+function LinearProgressWithLabel(props) {
+    return (
+        <div>
+            <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                <h1 className=' w-1/2'>Silo Seviyesi:</h1>  
+                <Box sx={{ width: '100%', mr: 1 }}>
+                <LinearProgress variant="determinate" {...props} />
+                </Box>
+                <Box sx={{ minWidth: 35 }}>
+                <Typography variant='body2' color="black">{`${props.value}%`}</Typography>
+                </Box>
+            </Box>
+        </div>
+    );
+}
+
+LinearProgressWithLabel.propTypes = {
+    /**
+     * The value of the progress indicator for the determinate and buffer variants.
+     * Value between 0 and 100.
+     */
+    value: PropTypes.number.isRequired,
+};
 
 
 export default Home

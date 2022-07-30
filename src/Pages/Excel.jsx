@@ -44,6 +44,9 @@ function Table(props) {
     const [yerkantar, setKantar] = useState();
     const [dara, setDara] = useState();
     const [rows, setRows] = useState([]);
+    const [v1, setV1] = useState(0);
+    const [v2, setV2] = useState(0);
+    const [v3, setV3] = useState(0);
     const handleChangeYerkantar = (event) => setKantar(event.target.value);
     const handleChangeDara = (event) => setDara(event.target.value);
     
@@ -52,14 +55,20 @@ function Table(props) {
         let id
         axios.get(`http://127.0.0.1:8001/get${props.urun}`).then(response => {
             let jsondata = response.data;
-            id = jsondata.splice(0)[0].id + 1;
+            if (jsondata.length > 0) {
+                id = jsondata.splice(0)[0].id + 1;
+            }else{
+                id = 1
+            }
+
         }).then(response => {
             let data = {
                 id: id,
                 kantar: yerkantar,
                 dara: dara,
                 urun: props.urun,
-                date: moment().format('DD/MM/YYYY - H:MM:SS')
+                date: moment().format('H:MM:SS DD/MM/YY')
+
             }
             axios.post('http://127.0.0.1:8001/saveData', data).then(response => {
                 console.log(response);
@@ -91,6 +100,97 @@ function Table(props) {
     useEffect(() => {
         refreshData()
     }, [])
+
+    useEffect(() => {
+        axios.get(`http://127.0.0.1:8001/get${props.urun}`).then(response => {
+            let jsondata = response.data;
+            let js = [];
+            for (let i = 0; i < jsondata.length; i++) {
+                let net = response.data[i].kantar - response.data[i].dara;
+                for (let k = 0; k < jsondata.length; k++) {
+                    const element = array[k];
+                    
+                }
+                net+=net
+                console.log(net);
+                setV1(net);
+            }
+            
+        }).catch(error => {
+            console.log(error);
+        })
+    },)
+
+
+    const columns = [
+        {
+            field: 'kantar',
+            headerName: 'Yer Kantarı',
+            type: 'number',
+            editable: true,
+            headerAlign: 'center',
+            flex: 1,
+            align: 'center',
+            
+        },
+        {
+            field: 'dara',
+            headerName: 'Dara',
+            type: 'number',
+            editable: true,
+            headerAlign: 'center',
+            flex: 1,
+            align: 'center',
+        },
+        {
+            field: 'net',
+            headerName: 'Net',
+            type: 'number',
+            editable: true,
+            headerAlign: 'center',
+            flex: 1,
+            align: 'center',
+        },
+        {
+            field: 'date',
+            headerName: 'Kayıt Tarihi',
+            type: 'dateTime',
+            headerAlign: 'center',
+            editable: false,
+            flex: 1,
+            align: 'center',
+        },
+        {
+            field: "Sil",
+            headerAlign: 'center',
+            
+            align: 'center',
+            renderCell: (cellValues) => {
+              return (
+                <Button
+                  variant="contained"
+                    color="warning"
+                    onClick={() => {
+                        console.log(cellValues.id)
+                        let data = {
+                            id: cellValues.id,
+                            urun: props.urun
+                        }
+                        axios.post('http://127.0.0.1:8001/deleteData', data).then(response => {
+                            console.log(response);
+                            refreshData()
+                        }).catch(error => {
+                            console.log(error);
+                        })
+                    }
+                }
+                >
+                  Sil
+                </Button>
+              );
+            }
+          },
+    ];
     return (
         <div className=' h-1/2   '>
             <ThemeProvider theme={theme}>
@@ -141,50 +241,18 @@ function Table(props) {
                         }}
                     />
                 </div>
+                <div className=' grid grid-cols-3 text-white p-2 text-center'>
+                    <h1>V1 Toplam:</h1>
+                    <h1>V2 Toplam:</h1>
+                    <h1>V3 Toplam:</h1>
+                </div>
             </ThemeProvider>
         </div>
     );
 }
 
-const columns = [
-    {
-        field: 'kantar',
-        headerName: 'Yer Kantarı',
-        type: 'number',
-        editable: true,
-        headerAlign: 'center',
-        flex: 1,
-        align: 'center',
-        
-    },
-    {
-        field: 'dara',
-        headerName: 'Dara',
-        type: 'number',
-        editable: true,
-        headerAlign: 'center',
-        flex: 1,
-        align: 'center',
-    },
-    {
-        field: 'net',
-        headerName: 'Net',
-        type: 'number',
-        editable: true,
-        headerAlign: 'center',
-        flex: 1,
-        align: 'center',
-    },
-    {
-        field: 'date',
-        headerName: 'Kayıt Tarihi',
-        type: 'date',
-        headerAlign: 'center',
-        editable: true,
-        flex: 1,
-        align: 'center',
-    }
-];
+
+
 
 
 
