@@ -40,6 +40,7 @@ export default function SaveData() {
     );
 }
 
+
 function Table(props) {
     const [yerkantar, setKantar] = useState();
     const [dara, setDara] = useState();
@@ -53,6 +54,7 @@ function Table(props) {
     function saveData() {
         moment.locale('tr');
         let id
+        let h = moment().format('H');
         axios.get(`http://127.0.0.1:8001/get${props.urun}`).then(response => {
             let jsondata = response.data;
             if (jsondata.length > 0) {
@@ -67,7 +69,8 @@ function Table(props) {
                 kantar: yerkantar,
                 dara: dara,
                 urun: props.urun,
-                date: moment().format('H:MM:SS DD/MM/YY')
+                date: moment().format('DD/MM/YY'),
+                hour: moment().format('H:MM'),
 
             }
             axios.post('http://127.0.0.1:8001/saveData', data).then(response => {
@@ -79,20 +82,45 @@ function Table(props) {
         });
     };  
 
+
     function refreshData() {
         axios.get(`http://127.0.0.1:8001/get${props.urun}`).then(response => {
             let jsondata = response.data;
             let js = [];
+            let oldv1 = 0
+            let oldv2 = 0
+            let oldv3 = 0;
             for (let i = 0; i < jsondata.length; i++) {
                 js.push({
-                    id: response.data[i].id,
-                    kantar: response.data[i].kantar,
-                    dara: response.data[i].dara,
-                    net: response.data[i].kantar - response.data[i].dara,
-                    date: response.data[i].date
+                    id: jsondata[i].id,
+                    kantar: jsondata[i].kantar,
+                    dara: jsondata[i].dara,
+                    net: jsondata[i].kantar - jsondata[i].dara,
+                    date: jsondata[i].date,
+                    hour: jsondata[i].hour
                 });
+                let d = jsondata[i].date.split('/')[0]
+                let h = jsondata[i].hour.split(':')[0]
+                let nowd = moment().format('DD')
+                if (d == nowd) { 
+                    let net = parseInt(jsondata[i].kantar - jsondata[i].dara)
+                    console.log(net)
+                    if (h >= 0 && h <= 7) {
+                        oldv1 += net
+                        setV1(oldv1)
+                    } else if (h >= 8 && h <= 15) {
+                        oldv2 += net
+                        setV2(oldv2)
+                        console.log(oldv2)
+                    } else if (h >= 16 && h <= 23) {
+                        oldv3 += net
+                        setV3(oldv3)
+                    }
+                }
+
             }
             setRows(js);
+
         }).catch(error => {
             console.log(error);
         })
@@ -101,24 +129,21 @@ function Table(props) {
         refreshData()
     }, [])
 
+
     useEffect(() => {
-        axios.get(`http://127.0.0.1:8001/get${props.urun}`).then(response => {
-            let jsondata = response.data;
-            let js = [];
-            for (let i = 0; i < jsondata.length; i++) {
-                let net = response.data[i].kantar - response.data[i].dara;
-                for (let k = 0; k < jsondata.length; k++) {
-                    const element = array[k];
-                    
-                }
-                net+=net
-                console.log(net);
-                setV1(net);
-            }
-            
-        }).catch(error => {
-            console.log(error);
-        })
+        // axios.get(`http://127.0.0.1:8001/get${props.urun}`).then(response => {
+        //     let jsondata = response.data;
+        //     let h = moment().format('H');
+        //     for (let i = 0; i < jsondata.length; i++) {
+        //         let net = response.data[i].kantar - response.data[i].dara;
+        //         totalnet += net;
+        //     }
+        //     setV1(totalnet);
+
+         
+        // }).catch(error => {
+        //     console.log(error);
+        // })
     },)
 
 
@@ -152,9 +177,16 @@ function Table(props) {
             align: 'center',
         },
         {
+            field: 'hour',
+            headerName: 'Kayıt Saati',
+            headerAlign: 'center',
+            editable: false,
+            flex: 1,
+            align: 'center',
+        },
+        {
             field: 'date',
             headerName: 'Kayıt Tarihi',
-            type: 'dateTime',
             headerAlign: 'center',
             editable: false,
             flex: 1,
@@ -242,9 +274,9 @@ function Table(props) {
                     />
                 </div>
                 <div className=' grid grid-cols-3 text-white p-2 text-center'>
-                    <h1>V1 Toplam:</h1>
-                    <h1>V2 Toplam:</h1>
-                    <h1>V3 Toplam:</h1>
+                    <h1>V1 Toplam: {v1}</h1>
+                    <h1>V2 Toplam: {v2}</h1>
+                    <h1>V3 Toplam: {v3}</h1>
                 </div>
             </ThemeProvider>
         </div>

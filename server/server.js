@@ -43,7 +43,7 @@ app.post("/deleteData", function (req, res) {
   console.log(req.body);
   var data = fs.readFileSync(`./data/${req.body.urun}.json`);
   var json = JSON.parse(data);
-  
+
   for (let i = 0; i < json.length; i++) {
     const element = json[i];
     if (element.id == req.body.id) {

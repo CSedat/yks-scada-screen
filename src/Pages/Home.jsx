@@ -142,7 +142,6 @@ function Home() {
 }
 
 function Auto(props) {
-    console.log(props.id)
     return (
         <div className='bg-gray-700 text-white h-auto p-2 rounded '>
             <ThemeProvider theme={theme}>
@@ -168,7 +167,6 @@ function Auto(props) {
 }
 
 function Manual(props) {
-    console.log(props.id)
     return (
         <div className='bg-gray-700 text-white h-auto p-2 rounded '>
             <ThemeProvider theme={theme}>
