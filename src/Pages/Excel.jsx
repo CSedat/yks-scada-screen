@@ -54,7 +54,6 @@ function Table(props) {
     function saveData() {
         moment.locale('tr');
         let id
-        let h = moment().format('H');
         axios.get(`http://127.0.0.1:8001/get${props.urun}`).then(response => {
             let jsondata = response.data;
             if (jsondata.length > 0) {
@@ -70,7 +69,7 @@ function Table(props) {
                 dara: dara,
                 urun: props.urun,
                 date: moment().format('DD/MM/YY'),
-                hour: moment().format('H:MM'),
+                hour: moment().format('H:mm'),
 
             }
             axios.post('http://127.0.0.1:8001/saveData', data).then(response => {
@@ -102,7 +101,7 @@ function Table(props) {
                 let d = jsondata[i].date.split('/')[0]
                 let h = jsondata[i].hour.split(':')[0]
                 let nowd = moment().format('DD')
-                if (d == nowd) { 
+                if (d === nowd) { 
                     let net = parseInt(jsondata[i].kantar - jsondata[i].dara)
                     console.log(net)
                     if (h >= 0 && h <= 7) {
@@ -111,7 +110,6 @@ function Table(props) {
                     } else if (h >= 8 && h <= 15) {
                         oldv2 += net
                         setV2(oldv2)
-                        console.log(oldv2)
                     } else if (h >= 16 && h <= 23) {
                         oldv3 += net
                         setV3(oldv3)
@@ -273,7 +271,8 @@ function Table(props) {
                         }}
                     />
                 </div>
-                <div className=' grid grid-cols-3 text-white p-2 text-center'>
+                
+                <div className=' bg-gray-600 rounded grid grid-cols-3 text-white p-2 text-center'>
                     <h1>V1 Toplam: {v1}</h1>
                     <h1>V2 Toplam: {v2}</h1>
                     <h1>V3 Toplam: {v3}</h1>
