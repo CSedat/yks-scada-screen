@@ -12,6 +12,7 @@ import Box from '@mui/material/Box';
 import { FaBell } from 'react-icons/fa';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import logo from '../assests/polyakeynez.png'
+import axios from 'axios';
 
 const theme = createTheme({
     palette: {
@@ -37,11 +38,19 @@ function Home() {
     const [bk2, set2] = useState(false)
     const [bk3, set3] = useState(false)
     const [bk4, set4] = useState(false)
+    const [bell1, setBell1] = useState(false)
+    const [bell2, setBell2] = useState(false)
+    const [bell3, setBell3] = useState(false)
+    const [bell4, setBell4] = useState(false)
     const updatebk1 = () => set1(!bk1)
     const updatebk2 = () => set2(!bk2)
     const updatebk3 = () => set3(!bk3)
     const updatebk4 = () => set4(!bk4)
-
+    const updatebell1 = () => setBell1(!bell1)
+    const updatebell2 = () => setBell2(!bell2)
+    const updatebell3 = () => setBell3(!bell3)
+    const updatebell4 = () => setBell4(!bell4)
+    
     useEffect(() => {
         const timer = setInterval(() => {
             setAraurunseviye((prevProgress) => (prevProgress >= 100 ? 1 : prevProgress + 1));
@@ -50,9 +59,34 @@ function Home() {
             setCevizseviye((prevProgress) => (prevProgress >= 100 ? 1 : prevProgress + 1));
         }, 200);
         return () => {
-          clearInterval(timer);
+            clearInterval(timer);
         };
+
     }, []);
+
+    useEffect(() => {
+        axios.post('http://localhost:8001/writePLCData', {
+            bools: {
+                bk1: bk1,
+                bk2: bk2,
+                bk3: bk3,
+                bk4: bk4,
+                bell1: bell1,
+                bell2: bell2,
+                bell3: bell3,
+                bell4: bell4
+            },
+            ints: {
+                araurunseviye: araurunseviye,
+                tozseviye: tozseviye,
+                findikseviye: findikseviye,
+                cevizseviye: cevizseviye
+            }
+        })
+    });
+    
+
+
     return (
         <div className='text-white text-center gap-4 place-items-stretch ' >
             <div className='absolute rounded top-40 left-1/2 transform -translate-x-1/2 -translate-y-1/2 h-56 w-96'>
@@ -66,7 +100,7 @@ function Home() {
                         <Typography>Otomatik</Typography>
                         <Switch onChange={updatebk1} inputProps={{ 'aria-label': 'ant design' }} />
                         <Typography>Manuel</Typography>
-                        <h3 className='absolute right-0 m-2 p-1 bg-yellow-500  rounded cursor-pointer flex justify-center items-center w-28 active:bg-yellow-300'><FaBell /> UYARI</h3>
+                        <button onMouseDown={ updatebell1 } onMouseUp={ updatebell1 }  className='absolute right-0 m-2 p-1 bg-yellow-500  rounded cursor-pointer flex justify-center items-center w-28 active:bg-yellow-300'><FaBell /> UYARI </button>
                     </div>
                     <Box sx={{ width: '100%' }}>
                       <LinearProgressWithLabel value={araurunseviye} />
@@ -81,7 +115,7 @@ function Home() {
                         <Typography>Otomatik</Typography>
                         <Switch onChange={updatebk2} inputProps={{ 'aria-label': 'ant design' }} />
                         <Typography>Manuel</Typography>
-                        <h3 className='absolute right-0 m-2 p-1 bg-yellow-500  rounded cursor-pointer flex justify-center items-center w-28 active:bg-yellow-300'><FaBell /> UYARI</h3>
+                        <h3 onMouseDown={ updatebell2 } onMouseUp={ updatebell2 } className='absolute right-0 m-2 p-1 bg-yellow-500  rounded cursor-pointer flex justify-center items-center w-28 active:bg-yellow-300'><FaBell /> UYARI</h3>
                     </div>
                     <Box sx={{ width: '100%' }}>
                       <LinearProgressWithLabel value={tozseviye} />
@@ -96,7 +130,7 @@ function Home() {
                         <Typography>Otomatik</Typography>
                         <Switch onChange={updatebk3} inputProps={{ 'aria-label': 'ant design' }} />
                         <Typography>Manuel</Typography>
-                        <h3 className='absolute right-0 m-2 p-1 bg-yellow-500  rounded cursor-pointer flex justify-center items-center w-28 active:bg-yellow-300'><FaBell /> UYARI</h3>
+                        <h3 onMouseDown={ updatebell3 } onMouseUp={ updatebell3 } className='absolute right-0 m-2 p-1 bg-yellow-500  rounded cursor-pointer flex justify-center items-center w-28 active:bg-yellow-300'><FaBell /> UYARI</h3>
                     </div>
                     <Box sx={{ width: '100%' }}>
                       <LinearProgressWithLabel value={findikseviye} />
@@ -111,7 +145,7 @@ function Home() {
                         <Typography>Otomatik</Typography>
                         <Switch onChange={updatebk4} inputProps={{ 'aria-label': 'ant design' }} />
                         <Typography>Manuel</Typography>
-                        <h3 className='absolute right-0 m-2 p-1 bg-yellow-500  rounded cursor-pointer flex justify-center items-center w-28 active:bg-yellow-300'><FaBell /> UYARI</h3>
+                        <h3 onMouseDown={ updatebell4 } onMouseUp={ updatebell4 } className='absolute right-0 m-2 p-1 bg-yellow-500  rounded cursor-pointer flex justify-center items-center w-28 active:bg-yellow-300'><FaBell /> UYARI</h3>
                     </div>
                     <Box sx={{ width: '100%' }}>
                       <LinearProgressWithLabel value={cevizseviye} />

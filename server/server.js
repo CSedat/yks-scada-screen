@@ -67,3 +67,109 @@ app.get("/gettoz", function (req, res) {
 app.get("/getaraurun", function (req, res) {
   res.sendFile("./data/araurun.json", { root: __dirname });
 });
+
+
+var readplcdata = [];
+var writeplcdata = {
+    bools: {
+        bk1: false,
+        bk2: false,
+        bk3: false,
+        bk4: false,
+        bell1: false,
+        bell2: false,
+        bell3: false,
+        bell4: false,
+        spare1: false,
+        spare2: false,
+        spare3: false,
+        spare4: false,
+        spare5: false,
+        spare6: false,
+        spare7: false,
+        spare8: false,
+        spare9: false,
+        spare10: false,
+        spare11: false,
+        spare12: false,
+    },
+    ints:{
+
+    }
+};
+
+var nodes7 = require('nodes7');
+var conn = new nodes7;
+var doneReading = false;
+var doneWriting = false;
+
+app.post("/writePLCData", function (req, res) {
+    writeplcdata = req.body;
+    res.send("ok");
+    res.end();
+    // console.log(writeplcdata)
+});
+
+var variables = {
+    Array1: 'DB6,X0.0.20',
+};
+
+conn.initiateConnection({
+    port: 102,
+    host: '192.168.30.15',
+    rack: 0,
+    slot: 1,
+    timeout: 30000,
+    debug: true
+}, connected);
+
+
+function connected(err) {
+    if (typeof (err) !== "undefined") {
+        console.log(err);
+    }
+    conn.setTranslationCB(function (tag) {
+        return variables[tag];
+    });
+    conn.addItems(['Array1']);
+    conn.readAllItems(valuesReady);
+    conn.writeItems(['Array1'], [
+        writeplcdata.bools.bk1,
+        writeplcdata.bools.bk2,
+        writeplcdata.bools.bk3,
+        writeplcdata.bools.bk4,
+        writeplcdata.bools.bell1,
+        writeplcdata.bools.bell2,
+        writeplcdata.bools.bell3,
+        writeplcdata.bools.bell4,
+        writeplcdata.bools.spare1,
+        writeplcdata.bools.spare2,
+        writeplcdata.bools.spare3,
+        writeplcdata.bools.spare4,
+        writeplcdata.bools.spare5,
+        writeplcdata.bools.spare6,
+        writeplcdata.bools.spare7,
+        writeplcdata.bools.spare8,
+        writeplcdata.bools.spare9,
+        writeplcdata.bools.spare10,
+        writeplcdata.bools.spare11,
+        writeplcdata.bools.spare12,
+    ], valuesWritten);
+}
+
+
+
+function valuesReady(err, values) {
+    if (err) { console.log("OKUNAN DEĞERLERDE HATA VAR"); }
+    conn.readAllItems(valuesReady);
+    readplcdata.array = values.Array1;
+    // console.log(readplcdata.array);
+}
+
+function valuesWritten(err) {
+    if (err) { console.log("YAZILAN DEĞERLERDE HATA VAR"); }
+    console.log("Yazıldı.");
+}
+app.get('/api/getPLCData', function (req, res) {
+    res.send(plcdata);
+});
