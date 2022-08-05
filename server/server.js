@@ -68,108 +68,117 @@ app.get("/getaraurun", function (req, res) {
   res.sendFile("./data/araurun.json", { root: __dirname });
 });
 
-
-var readplcdata = [];
-var writeplcdata = {
-    bools: {
-        bk1: false,
-        bk2: false,
-        bk3: false,
-        bk4: false,
-        bell1: false,
-        bell2: false,
-        bell3: false,
-        bell4: false,
-        spare1: false,
-        spare2: false,
-        spare3: false,
-        spare4: false,
-        spare5: false,
-        spare6: false,
-        spare7: false,
-        spare8: false,
-        spare9: false,
-        spare10: false,
-        spare11: false,
-        spare12: false,
-    },
-    ints:{
-
-    }
-};
-
-var nodes7 = require('nodes7');
+var nodes7 = require('nodes7'); // This is the package name, if the repository is cloned you may need to require 'nodeS7' with uppercase S
 var conn = new nodes7;
 var doneReading = false;
-var doneWriting = false;
+var doneWriting = true;
+
+var variables = {
+    Bits: 'DB200,X0.0.21',  // Array of 8 bits in a data block
+    Ints: 'DB200,INT4.5',  // Array of 8 bits in a data block
+};
+
+conn.initiateConnection({ port: 102, 
+    host: '192.168.1.21', 
+    rack: 0, 
+    slot: 1, 
+    debug: true 
+}, connected);
+
+var readplcdata = {};
+let writeplcdata = {};
 
 app.post("/writePLCData", function (req, res) {
     writeplcdata = req.body;
+    console.log(doneWriting)
+    if (doneWriting) {
+        console.log('Sex')
+        conn.writeItems('Bits', [
+            writeplcdata.bools.bk1,
+            writeplcdata.bools.bk2,
+            writeplcdata.bools.bk3,
+            writeplcdata.bools.bk4,
+            writeplcdata.bools.bell1,
+            writeplcdata.bools.bell2,
+            writeplcdata.bools.bell3,
+            writeplcdata.bools.bell4,
+            writeplcdata.bools.spare1,
+            writeplcdata.bools.spare2,
+            writeplcdata.bools.spare3,
+            writeplcdata.bools.spare4,
+            writeplcdata.bools.spare5,
+            writeplcdata.bools.spare6,
+            writeplcdata.bools.spare7,
+            writeplcdata.bools.spare8,
+            writeplcdata.bools.spare9,
+            writeplcdata.bools.spare10,
+            writeplcdata.bools.spare11,
+            writeplcdata.bools.spare12,
+          ], valuesWritten);
+        }
     res.send("ok");
     res.end();
     // console.log(writeplcdata)
 });
 
-var variables = {
-    Array1: 'DB6,X0.0.20',
-};
-
-conn.initiateConnection({
-    port: 102,
-    host: '192.168.30.15',
-    rack: 0,
-    slot: 1,
-    timeout: 30000,
-    debug: true
-}, connected);
-
+app.get('/getPLCData', function (req, res) {
+    conn.readAllItems(valuesReady);
+    res.send(readplcdata);
+});
 
 function connected(err) {
-    if (typeof (err) !== "undefined") {
-        console.log(err);
+    if (typeof(err) !== "undefined") {
+      console.log(err);
+    //   process.exit();
     }
-    conn.setTranslationCB(function (tag) {
-        return variables[tag];
-    });
-    conn.addItems(['Array1']);
+    conn.setTranslationCB(function(tag) { return variables[tag]; }); // This sets the "translation" to allow us to work with object names
+    conn.addItems(['Bits', 'Ints']);
     conn.readAllItems(valuesReady);
-    conn.writeItems(['Array1'], [
-        writeplcdata.bools.bk1,
-        writeplcdata.bools.bk2,
-        writeplcdata.bools.bk3,
-        writeplcdata.bools.bk4,
-        writeplcdata.bools.bell1,
-        writeplcdata.bools.bell2,
-        writeplcdata.bools.bell3,
-        writeplcdata.bools.bell4,
-        writeplcdata.bools.spare1,
-        writeplcdata.bools.spare2,
-        writeplcdata.bools.spare3,
-        writeplcdata.bools.spare4,
-        writeplcdata.bools.spare5,
-        writeplcdata.bools.spare6,
-        writeplcdata.bools.spare7,
-        writeplcdata.bools.spare8,
-        writeplcdata.bools.spare9,
-        writeplcdata.bools.spare10,
-        writeplcdata.bools.spare11,
-        writeplcdata.bools.spare12,
-    ], valuesWritten);
+}
+
+function valuesReady(anythingBad, values) {
+    if (anythingBad) { console.log("SOMETHING WENT WRONG READING VALUES!!!!"); }
+    // console.log(values);
+    readplcdata = {
+        bools: {
+            bk1: values.Bits[0],
+            bk2: values.Bits[1],
+            bk3: values.Bits[2],
+            bk4: values.Bits[3],
+            bell1: values.Bits[4],
+            bell2: values.Bits[5],
+            bell3: values.Bits[6],
+            bell4: values.Bits[7],
+            spare1: values.Bits[8],
+            spare2: values.Bits[9],
+            spare3: values.Bits[10],
+            spare4: values.Bits[11],
+            spare5: values.Bits[12],
+            spare6: values.Bits[13],
+            spare7: values.Bits[14],
+            spare8: values.Bits[15],
+            spare9: values.Bits[16],
+            spare10: values.Bits[17],
+            spare11: values.Bits[18],
+            spare12: values.Bits[19],
+        },
+        Ints: {
+            araurunseviye: values.Ints[0],
+            tozseviye: values.Ints[1],
+            findikseviye: values.Ints[2],
+            cevizseviye: values.Ints[3],
+            int5: values.Ints[4],
+        }
+
+    };
+    doneReading = true;
+    // if (doneWriting) { conn.readAllItems(valuesReady); }
+}
+
+function valuesWritten(anythingBad) {
+  if (anythingBad) { console.log("SOMETHING WENT WRONG WRITING VALUES!!!!"); }
+  console.log("Done writing.");
+  doneWriting = true;
 }
 
 
-
-function valuesReady(err, values) {
-    if (err) { console.log("OKUNAN DEĞERLERDE HATA VAR"); }
-    conn.readAllItems(valuesReady);
-    readplcdata.array = values.Array1;
-    // console.log(readplcdata.array);
-}
-
-function valuesWritten(err) {
-    if (err) { console.log("YAZILAN DEĞERLERDE HATA VAR"); }
-    console.log("Yazıldı.");
-}
-app.get('/api/getPLCData', function (req, res) {
-    res.send(plcdata);
-});

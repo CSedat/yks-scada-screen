@@ -10,9 +10,12 @@ import PropTypes from 'prop-types';
 import LinearProgress from '@mui/material/LinearProgress';
 import Box from '@mui/material/Box';
 import { FaBell } from 'react-icons/fa';
+import { HiOutlineStatusOnline, HiOutlineStatusOffline } from "react-icons/hi";
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import logo from '../assests/polyakeynez.png'
 import axios from 'axios';
+const ipadress = 'http://localhost:8001/';
+let connectionok = false;
 
 const theme = createTheme({
     palette: {
@@ -29,12 +32,14 @@ const theme = createTheme({
     },
 });
 
+
 function Home() {
+    
     const [araurunseviye, setAraurunseviye] = useState(10);
     const [tozseviye, setTozseviye] = useState(20);
     const [findikseviye, setFindikseviye] = useState(30);
     const [cevizseviye, setCevizseviye] = useState(40);
-    const [bk1, set1] = useState(false)
+    const [bk1, set1] = useState(false);
     const [bk2, set2] = useState(false)
     const [bk3, set3] = useState(false)
     const [bk4, set4] = useState(false)
@@ -53,19 +58,43 @@ function Home() {
     
     useEffect(() => {
         const timer = setInterval(() => {
-            setAraurunseviye((prevProgress) => (prevProgress >= 100 ? 1 : prevProgress + 1));
-            setTozseviye((prevProgress) => (prevProgress >= 100 ? 1 : prevProgress + 1));
-            setFindikseviye((prevProgress) => (prevProgress >= 100 ? 1 : prevProgress + 1));
-            setCevizseviye((prevProgress) => (prevProgress >= 100 ? 1 : prevProgress + 1));
-        }, 200);
+            try {
+                axios.get(`${ipadress}getPLCData`).then(res => {
+                    setAraurunseviye(res.data.Ints.araurunseviye)
+                    setTozseviye(res.data.Ints.tozseviye)
+                    setFindikseviye(res.data.Ints.findikseviye)
+                    setCevizseviye(res.data.Ints.cevizseviye)
+                    connectionok = true;
+                }).catch(err => {
+                    console.log(err)
+                    connectionok = false;
+                })
+            } catch (error) {
+                console.log(error)
+                connectionok = false;
+            }
+                
+            
+            
+        }, 500);
+        axios.get(`${ipadress}getPLCData`).then(res => {
+            let bb = res.data;
+            set1(bb.bools.bk1)
+            set2(bb.bools.bk2)
+            set3(bb.bools.bk3)
+            set4(bb.bools.bk4)
+        }).catch(err => {
+            console.log(err)
+        })
         return () => {
             clearInterval(timer);
         };
 
+
     }, []);
 
     useEffect(() => {
-        axios.post('http://localhost:8001/writePLCData', {
+        axios.post(`${ipadress}writePLCData`, {
             bools: {
                 bk1: bk1,
                 bk2: bk2,
@@ -91,14 +120,14 @@ function Home() {
         <div className='text-white text-center gap-4 place-items-stretch ' >
             <div className='absolute rounded top-40 left-1/2 transform -translate-x-1/2 -translate-y-1/2 h-56 w-96'>
                 <img src={logo} alt="" />
-                
+                {connectionok ? <div className='text-green-500 text-center gap-4 place-items-stretch flex justify-center border border-green-500 rounded' >Sunucu Bağlantısı Kuruldu <HiOutlineStatusOnline size={25}/>  </div> : <div className='text-red-500 text-center gap-4 place-items-stretch items-center flex justify-center border border-red-500 rounded' > Sunucu Bağlantısı Koptu <HiOutlineStatusOffline size={25}/></div>}
             </div>
             <Stack className='absolute top-0 left-0 w-1/4 h-96  m-2'>
                 <div className='bg-gray-300 rounded max-h-16 text-black justify-center items-center text-center'>
                     <div className='flex items-center justify-center text-black'>
                         <h1 className='absolute left-0 m-2 p-1 bg-yellow-500 rounded'>BK-01 ARAÜRÜN</h1>
                         <Typography>Otomatik</Typography>
-                        <Switch onChange={updatebk1} inputProps={{ 'aria-label': 'ant design' }} />
+                        <Switch onChange={updatebk1} checked={bk1}  inputProps={{ 'aria-label': 'ant design' }} />
                         <Typography>Manuel</Typography>
                         <button onMouseDown={ updatebell1 } onMouseUp={ updatebell1 }  className='absolute right-0 m-2 p-1 bg-yellow-500  rounded cursor-pointer flex justify-center items-center w-28 active:bg-yellow-300'><FaBell /> UYARI </button>
                     </div>
@@ -113,7 +142,7 @@ function Home() {
                     <div className='flex items-center justify-center text-black'>
                         <h1 className='absolute left-0 m-2 p-1 bg-yellow-500 rounded'>BK-02 TOZ</h1>
                         <Typography>Otomatik</Typography>
-                        <Switch onChange={updatebk2} inputProps={{ 'aria-label': 'ant design' }} />
+                        <Switch onChange={updatebk2} checked={bk2} inputProps={{ 'aria-label': 'ant design' }} />
                         <Typography>Manuel</Typography>
                         <h3 onMouseDown={ updatebell2 } onMouseUp={ updatebell2 } className='absolute right-0 m-2 p-1 bg-yellow-500  rounded cursor-pointer flex justify-center items-center w-28 active:bg-yellow-300'><FaBell /> UYARI</h3>
                     </div>
@@ -128,7 +157,7 @@ function Home() {
                     <div className='flex items-center justify-center text-black'>
                         <h1 className='absolute left-0 m-2 p-1 bg-yellow-500 rounded'>BK-03 FINDIK</h1>
                         <Typography>Otomatik</Typography>
-                        <Switch onChange={updatebk3} inputProps={{ 'aria-label': 'ant design' }} />
+                        <Switch onChange={updatebk3} checked={bk3} inputProps={{ 'aria-label': 'ant design' }} />
                         <Typography>Manuel</Typography>
                         <h3 onMouseDown={ updatebell3 } onMouseUp={ updatebell3 } className='absolute right-0 m-2 p-1 bg-yellow-500  rounded cursor-pointer flex justify-center items-center w-28 active:bg-yellow-300'><FaBell /> UYARI</h3>
                     </div>
@@ -143,7 +172,7 @@ function Home() {
                     <div className='flex items-center justify-center text-black'>
                         <h1 className='absolute left-0 m-2 p-1 bg-yellow-500 rounded'>BK-04 CEVİZ</h1>
                         <Typography>Otomatik</Typography>
-                        <Switch onChange={updatebk4} inputProps={{ 'aria-label': 'ant design' }} />
+                        <Switch onChange={updatebk4} checked={bk4} inputProps={{ 'aria-label': 'ant design' }} />
                         <Typography>Manuel</Typography>
                         <h3 onMouseDown={ updatebell4 } onMouseUp={ updatebell4 } className='absolute right-0 m-2 p-1 bg-yellow-500  rounded cursor-pointer flex justify-center items-center w-28 active:bg-yellow-300'><FaBell /> UYARI</h3>
                     </div>
