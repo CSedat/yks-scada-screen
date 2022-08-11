@@ -7,6 +7,7 @@ const bodyParser = require("body-parser");
 const moment = require("moment");
 const XLSX = require("xlsx");
 const path = require("path");
+let PLCconnected = false;
 
 app.use(cors());
 app.use(bodyParser.json());
@@ -68,14 +69,15 @@ app.get("/getaraurun", function (req, res) {
   res.sendFile("./data/araurun.json", { root: __dirname });
 });
 
-var nodes7 = require('nodes7'); // This is the package name, if the repository is cloned you may need to require 'nodeS7' with uppercase S
+var nodes7 = require('nodes7');
 var conn = new nodes7;
 var doneReading = false;
 var doneWriting = true;
 
 var variables = {
-    Bits: 'DB200,X0.0.21',  // Array of 8 bits in a data block
-    Ints: 'DB200,INT4.5',  // Array of 8 bits in a data block
+    Bits: 'DB200,X0.0.21',
+    Ints: 'DB200,INT4.5',
+    Status: 'DB200,X46.0.31',
 };
 
 conn.initiateConnection({ port: 102, 
@@ -92,7 +94,6 @@ app.post("/writePLCData", function (req, res) {
     writeplcdata = req.body;
     console.log(doneWriting)
     if (doneWriting) {
-        console.log('Sex')
         conn.writeItems('Bits', [
             writeplcdata.bools.bk1,
             writeplcdata.bools.bk2,
@@ -132,13 +133,12 @@ function connected(err) {
     //   process.exit();
     }
     conn.setTranslationCB(function(tag) { return variables[tag]; }); // This sets the "translation" to allow us to work with object names
-    conn.addItems(['Bits', 'Ints']);
+    conn.addItems(['Bits', 'Ints', 'Status']);
     conn.readAllItems(valuesReady);
 }
 
-function valuesReady(anythingBad, values) {
-    if (anythingBad) { console.log("SOMETHING WENT WRONG READING VALUES!!!!"); }
-    // console.log(values);
+function valuesReady(err, values) {
+    if (err) { console.log("PLC Bağlantısı kopuk yada değerler yanlış!!!!"); PLCconnected = false;}else{PLCconnected = true;}
     readplcdata = {
         bools: {
             bk1: values.Bits[0],
@@ -168,16 +168,17 @@ function valuesReady(anythingBad, values) {
             findikseviye: values.Ints[2],
             cevizseviye: values.Ints[3],
             int5: values.Ints[4],
-        }
-
+        },
+        Connected: PLCconnected,
+        Status: values.Status,
     };
     doneReading = true;
     // if (doneWriting) { conn.readAllItems(valuesReady); }
 }
 
-function valuesWritten(anythingBad) {
-  if (anythingBad) { console.log("SOMETHING WENT WRONG WRITING VALUES!!!!"); }
-  console.log("Done writing.");
+function valuesWritten(err) {
+  if (err) { console.log("PLC Bağlantısı kopuk yada değerler yanlış!!!!"); }
+  console.log("Yazıldı.");
   doneWriting = true;
 }
 

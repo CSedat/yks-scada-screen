@@ -5,17 +5,187 @@ import Switch from '@mui/material/Switch';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 import Alert from '@mui/material/Alert';
-import AlertTitle from '@mui/material/AlertTitle';
 import PropTypes from 'prop-types';
 import LinearProgress from '@mui/material/LinearProgress';
 import Box from '@mui/material/Box';
 import { FaBell } from 'react-icons/fa';
-import { HiOutlineStatusOnline, HiOutlineStatusOffline } from "react-icons/hi";
+import { HiOutlineStatusOnline, HiOutlineStatusOffline, HiRefresh } from "react-icons/hi";
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import logo from '../assests/polyakeynez.png'
 import axios from 'axios';
+
+
 const ipadress = 'http://localhost:8001/';
-let connectionok = false;
+let serverconnectionok = false;
+let plcconneectionok = false;
+let status = {}
+let alarms = {
+    0: {
+        value: false,
+        text: 'Silo 1 dolu'
+    },
+    1: {
+        value: false,
+        text: 'Silo 2 dolu'
+    },
+    2: {
+        value: false,
+        text: 'Silo 3 dolu'
+    },
+    3: {
+        value: false,
+        text: 'Silo 4 dolu'
+    },
+    4: {
+        value: false,
+        text: 'Silo 1 dolu'
+    },
+    5: {
+        value: false,
+        text: 'Silo 2 dolu'
+    },
+    6: {
+        value: false,
+        text: 'Silo 3 dolu'
+    },
+    7: {
+        value: false,
+        text: 'Silo 4 dolu'
+    },
+    8: {
+        value: false,
+        text: 'Silo 1 dolu'
+    },
+    9: {
+        value: false,
+        text: 'Silo 2 dolu'
+    },
+    10: {
+        value: false,
+        text: 'Silo 3 dolu'
+    },
+    11: {
+        value: false,
+        text: 'Silo 4 dolu'
+    },
+    12: {
+        value: false,
+        text: 'Silo 1 dolu'
+    },
+    13: {
+        value: false,
+        text: 'Silo 2 dolu'
+    },
+    14: {
+        value: false,
+        text: 'Silo 3 dolu'
+    },
+    15: {
+        value: false,
+        text: 'Silo 4 dolu'
+    },
+    16: {
+        value: false,
+        text: 'Silo 1 dolu'
+    },
+    17: {
+        value: false,
+        text: 'Silo 2 dolu'
+    },
+    18: {
+        value: false,
+        text: 'Silo 3 dolu'
+    },
+    19: {
+        value: false,
+        text: 'Silo 4 dolu'
+    },
+    20: {
+        value: false,
+        text: 'Silo 1 dolu'
+    },
+    21: {
+        value: false,
+        text: 'Silo 3 dolu'
+    },
+    22: {
+        value: false,
+        text: 'Silo 4 dolu'
+    },
+    23: {
+        value: false,
+        text: 'Silo 1 dolu'
+    },
+    24: {
+        value: false,
+        text: 'Silo 2 dolu'
+    },
+    25: {
+        value: false,
+        text: 'Silo 3 dolu'
+    },
+    26: {
+        value: false,
+        text: 'Silo 4 dolu'
+    },
+    27: {
+        value: false,
+        text: 'Silo 1 dolu'
+    },
+    28: {
+        value: false,
+        text: 'Silo 2 dolu'
+    },
+    29: {
+        value: false,
+        text: 'Silo 3 dolu'
+    },
+    30: {
+        value: false,
+        text: 'Silo 4 dolu'
+    },
+    31: {
+        value: false,
+        text: 'Silo 1 dolu'
+    },
+    32: {
+        value: false,
+        text: 'Silo 1 dolu'
+    },
+    33: {
+        value: false,
+        text: 'Silo 2 dolu'
+    },
+    34: {
+        value: false,
+        text: 'Silo 3 dolu'
+    },
+    35: {
+        value: false,
+        text: 'Silo 4 dolu'
+    },
+    36: {
+        value: false,
+        text: 'Silo 1 dolu'
+    },
+    37: {
+        value: false,
+        text: 'Silo 2 dolu'
+    },
+    38: {
+        value: false,
+        text: 'Silo 3 dolu'
+    },
+    39: {
+        value: false,
+        text: 'Silo 4 dolu'
+    },
+    40: {
+        value: false,
+        text: 'Silo 1 dolu'
+    },
+
+}
 
 const theme = createTheme({
     palette: {
@@ -31,7 +201,6 @@ const theme = createTheme({
 
     },
 });
-
 
 function Home() {
     
@@ -64,18 +233,27 @@ function Home() {
                     setTozseviye(res.data.Ints.tozseviye)
                     setFindikseviye(res.data.Ints.findikseviye)
                     setCevizseviye(res.data.Ints.cevizseviye)
-                    connectionok = true;
+                    serverconnectionok = true;
+                    plcconneectionok = res.data.Connected;
+                    status = res.data.Status;
+                    for (let j = 0; j < status.length; j++) {
+                        const element = status[j];
+                        if (element){
+                            alarms[j].value = true;
+                        }
+                        else{
+                            alarms[j].value = false;
+                        }
+                    }
+                    Alarms();
                 }).catch(err => {
                     console.log(err)
-                    connectionok = false;
+                    serverconnectionok = false;
                 })
             } catch (error) {
                 console.log(error)
-                connectionok = false;
+                serverconnectionok = false;
             }
-                
-            
-            
         }, 500);
         axios.get(`${ipadress}getPLCData`).then(res => {
             let bb = res.data;
@@ -118,9 +296,17 @@ function Home() {
 
     return (
         <div className='text-white text-center gap-4 place-items-stretch ' >
-            <div className='absolute rounded top-40 left-1/2 transform -translate-x-1/2 -translate-y-1/2 h-56 w-96'>
+            <div className='absolute rounded top-40 left-1/2 transform -translate-x-1/2 -translate-y-1/2 h-56 w-96 '>
                 <img src={logo} alt="" />
-                {connectionok ? <div className='text-green-500 text-center gap-4 place-items-stretch flex justify-center border border-green-500 rounded' >Sunucu Bağlantısı Kuruldu <HiOutlineStatusOnline size={25}/>  </div> : <div className='text-red-500 text-center gap-4 place-items-stretch items-center flex justify-center border border-red-500 rounded' > Sunucu Bağlantısı Koptu <HiOutlineStatusOffline size={25}/></div>}
+                <div className='grid gap-4'>
+                    <div>
+                        {serverconnectionok ? <div className='text-green-500 text-center gap-4 place-items-stretch flex justify-center border border-green-500 rounded' > Sunucu Bağlantısı Kuruldu <HiOutlineStatusOnline size={25}/>  </div> : <div className='text-red-500 text-center gap-4 place-items-stretch items-center flex justify-center border border-red-500 rounded' > Sunucu Bağlantısı Koptu <HiOutlineStatusOffline size={25}/></div>}
+                    </div>
+                    <div>
+                        {plcconneectionok ? <div className='text-green-500 text-center gap-4 place-items-stretch flex justify-center border border-green-500 rounded' >PLC Bağlantısı Kuruldu <HiOutlineStatusOnline size={25}/>  </div> : <div className='text-red-500 text-center gap-4 place-items-stretch items-center flex justify-center border border-red-500 rounded' > PLC Bağlantısı Koptu <HiOutlineStatusOffline size={25}/></div>}
+                    </div>
+                    <button className=' bg-green-700 border hover:bg-green-900 border-white rounded flex justify-center' onClick={() => window.location.reload(false)}>BAĞLANTIYI YENILE   <HiRefresh size={25}/></button>
+                </div>
             </div>
             <Stack className='absolute top-0 left-0 w-1/4 h-96  m-2'>
                 <div className='bg-gray-300 rounded max-h-16 text-black justify-center items-center text-center'>
@@ -184,21 +370,9 @@ function Home() {
             </Stack>
             <div className='absolute rounded bottom-40 left-1/2 transform -translate-x-1/2 -translate-y-1/2 h-64 w-1/3 bg-gray-700  '>
                 <h1 className=' bg-gray-300'><strong>ALARMLAR</strong></h1>
-
                 <Stack sx={{ width: '100%', height: '30%' }} spacing={1}>
-
-
-                    <Alert sx={{ width: '100%', height: '90%' }} severity="error">
-                        <AlertTitle>HATA</AlertTitle>
-                        Bant kaydı hatası!
-                    </Alert>
-                    <Alert severity="error">
-                        <AlertTitle>HATA</AlertTitle>
-                        İp çekti hatası!
-                    </Alert>
-
+                    {/* <Alarms/> */}
                 </Stack>
-
             </div>
         </div>
     )
@@ -269,6 +443,21 @@ function LinearProgressWithLabel(props) {
             </Box>
         </div>
     );
+}
+let array = []
+setInterval(() => {
+    for (let k = 0; k < 30; k++) {
+        const element = array[k];
+        array.push({
+            text: 'Uyarı',
+            value: false
+        })
+    }
+    console.log(array)
+} , 1000)
+
+function Alarms(props) {
+    
 }
 
 LinearProgressWithLabel.propTypes = {
