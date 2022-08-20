@@ -4,7 +4,7 @@ import Button from '@mui/material/Button';
 import Switch from '@mui/material/Switch';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
-import Alert from '@mui/material/Alert';
+// import Alert from '@mui/material/Alert';
 import PropTypes from 'prop-types';
 import LinearProgress from '@mui/material/LinearProgress';
 import Box from '@mui/material/Box';
@@ -18,174 +18,6 @@ import axios from 'axios';
 const ipadress = 'http://localhost:8001/';
 let serverconnectionok = false;
 let plcconneectionok = false;
-let status = {}
-let alarms = {
-    0: {
-        value: false,
-        text: 'Silo 1 dolu'
-    },
-    1: {
-        value: false,
-        text: 'Silo 2 dolu'
-    },
-    2: {
-        value: false,
-        text: 'Silo 3 dolu'
-    },
-    3: {
-        value: false,
-        text: 'Silo 4 dolu'
-    },
-    4: {
-        value: false,
-        text: 'Silo 1 dolu'
-    },
-    5: {
-        value: false,
-        text: 'Silo 2 dolu'
-    },
-    6: {
-        value: false,
-        text: 'Silo 3 dolu'
-    },
-    7: {
-        value: false,
-        text: 'Silo 4 dolu'
-    },
-    8: {
-        value: false,
-        text: 'Silo 1 dolu'
-    },
-    9: {
-        value: false,
-        text: 'Silo 2 dolu'
-    },
-    10: {
-        value: false,
-        text: 'Silo 3 dolu'
-    },
-    11: {
-        value: false,
-        text: 'Silo 4 dolu'
-    },
-    12: {
-        value: false,
-        text: 'Silo 1 dolu'
-    },
-    13: {
-        value: false,
-        text: 'Silo 2 dolu'
-    },
-    14: {
-        value: false,
-        text: 'Silo 3 dolu'
-    },
-    15: {
-        value: false,
-        text: 'Silo 4 dolu'
-    },
-    16: {
-        value: false,
-        text: 'Silo 1 dolu'
-    },
-    17: {
-        value: false,
-        text: 'Silo 2 dolu'
-    },
-    18: {
-        value: false,
-        text: 'Silo 3 dolu'
-    },
-    19: {
-        value: false,
-        text: 'Silo 4 dolu'
-    },
-    20: {
-        value: false,
-        text: 'Silo 1 dolu'
-    },
-    21: {
-        value: false,
-        text: 'Silo 3 dolu'
-    },
-    22: {
-        value: false,
-        text: 'Silo 4 dolu'
-    },
-    23: {
-        value: false,
-        text: 'Silo 1 dolu'
-    },
-    24: {
-        value: false,
-        text: 'Silo 2 dolu'
-    },
-    25: {
-        value: false,
-        text: 'Silo 3 dolu'
-    },
-    26: {
-        value: false,
-        text: 'Silo 4 dolu'
-    },
-    27: {
-        value: false,
-        text: 'Silo 1 dolu'
-    },
-    28: {
-        value: false,
-        text: 'Silo 2 dolu'
-    },
-    29: {
-        value: false,
-        text: 'Silo 3 dolu'
-    },
-    30: {
-        value: false,
-        text: 'Silo 4 dolu'
-    },
-    31: {
-        value: false,
-        text: 'Silo 1 dolu'
-    },
-    32: {
-        value: false,
-        text: 'Silo 1 dolu'
-    },
-    33: {
-        value: false,
-        text: 'Silo 2 dolu'
-    },
-    34: {
-        value: false,
-        text: 'Silo 3 dolu'
-    },
-    35: {
-        value: false,
-        text: 'Silo 4 dolu'
-    },
-    36: {
-        value: false,
-        text: 'Silo 1 dolu'
-    },
-    37: {
-        value: false,
-        text: 'Silo 2 dolu'
-    },
-    38: {
-        value: false,
-        text: 'Silo 3 dolu'
-    },
-    39: {
-        value: false,
-        text: 'Silo 4 dolu'
-    },
-    40: {
-        value: false,
-        text: 'Silo 1 dolu'
-    },
-
-}
 
 const theme = createTheme({
     palette: {
@@ -203,28 +35,138 @@ const theme = createTheme({
 });
 
 function Home() {
-    
     const [araurunseviye, setAraurunseviye] = useState(10);
     const [tozseviye, setTozseviye] = useState(20);
     const [findikseviye, setFindikseviye] = useState(30);
     const [cevizseviye, setCevizseviye] = useState(40);
-    const [bk1, set1] = useState(false);
-    const [bk2, set2] = useState(false)
-    const [bk3, set3] = useState(false)
-    const [bk4, set4] = useState(false)
-    const [bell1, setBell1] = useState(false)
-    const [bell2, setBell2] = useState(false)
-    const [bell3, setBell3] = useState(false)
-    const [bell4, setBell4] = useState(false)
-    const updatebk1 = () => set1(!bk1)
-    const updatebk2 = () => set2(!bk2)
-    const updatebk3 = () => set3(!bk3)
-    const updatebk4 = () => set4(!bk4)
-    const updatebell1 = () => setBell1(!bell1)
-    const updatebell2 = () => setBell2(!bell2)
-    const updatebell3 = () => setBell3(!bell3)
-    const updatebell4 = () => setBell4(!bell4)
-    
+
+    const [bk1, set1] = useState(false); // (bool) Otomatik/Manuel false-oto 
+    const [bk1autostrt, setBk1autostr] = useState(false);
+    const Bk1autostr = () => setBk1autostr(!bk1autostrt); // (bool)
+    const [bk1autostp, setBk1autostp] = useState(false);
+    const Bk1autostp = () => setBk1autostp(!bk1autostp); // (bool)
+    const [bk1hertz, setBk1hertz] = useState(0); // (int) %0-100
+    const updateBk1hertz = (e) => {
+        setBk1hertz(e);
+        axios.post(`${ipadress}writePLCDataInts`, {
+            ints: {
+                bk1hertz: e,
+                bk2hertz: bk2hertz,
+                bk3hertz: bk3hertz,
+                bk4hertz: bk4hertz,
+            }
+        })
+    } // (int) %0-100
+    const [bk1manbantstrt, setBk1manbantstrt] = useState(false);
+    const Bk1manbantstrt = () => setBk1manbantstrt(!bk1manbantstrt); // (bool)
+    const [bk1manbantstp, setBk1manbantstp] = useState(false);
+    const Bk1manbantstp = () => setBk1manbantstp(!bk1manbantstp); // (bool)
+    const [bk1manklpopen, setBk1manklpopen] = useState(false);
+    const Bk1manklpopen = () => setBk1manklpopen(!bk1manklpopen); // (bool)
+    const [bk1manklpclose, setBk1manklpclose] = useState(false);
+    const Bk1manklpclose = () => setBk1manklpclose(!bk1manklpclose); // (bool)
+
+
+
+    const [bk2, set2] = useState(false); // (bool) Otomatik/Manuel false-oto 
+    const [bk2autostrt, setBk2autostr] = useState(false);
+    const Bk2autostr = () => setBk2autostr(!bk2autostrt); // (bool)
+    const [bk2autostp, setBk2autostp] = useState(false);
+    const Bk2autostp = () => setBk2autostp(!bk2autostp); // (bool)
+    const [bk2hertz, setBk2hertz] = useState(0);
+    const updateBk2hertz = (e) => {
+        setBk2hertz(e);
+        axios.post(`${ipadress}writePLCDataInts`, {
+            ints: {
+                bk1hertz: bk1hertz,
+                bk2hertz: e,
+                bk3hertz: bk3hertz,
+                bk4hertz: bk4hertz,
+            }
+        })
+    } // (int) %0-100
+    const [bk2manbantstrt, setBk2manbantstrt] = useState(false);
+    const Bk2manbantstrt = () => setBk2manbantstrt(!bk2manbantstrt); // (bool)
+    const [bk2manbantstp, setBk2manbantstp] = useState(false);
+    const Bk2manbantstp = () => setBk2manbantstp(!bk2manbantstp); // (bool)
+    const [bk2manklpopen, setBk2manklpopen] = useState(false);
+    const Bk2manklpopen = () => setBk2manklpopen(!bk2manklpopen); // (bool)
+    const [bk2manklpclose, setBk2manklpclose] = useState(false);
+    const Bk2manklpclose = () => setBk2manklpclose(!bk2manklpclose); // (bool)
+
+    const [bk3, set3] = useState(false); // (bool) Otomatik/Manuel false-oto 
+    const [bk3autostrt, setBk3autostr] = useState(false);
+    const Bk3autostr = () => setBk3autostr(!bk3autostrt); // (bool)
+    const [bk3autostp, setBk3autostp] = useState(false);
+    const Bk3autostp = () => setBk3autostp(!bk3autostp); // (bool)
+    const [bk3hertz, setBk3hertz] = useState(0);
+    const updateBk3hertz = (e) => {
+        setBk3hertz(e);
+        axios.post(`${ipadress}writePLCDataInts`, {
+            ints: {
+                bk1hertz: bk1hertz,
+                bk2hertz: bk2hertz,
+                bk3hertz: e,
+                bk4hertz: bk4hertz,
+            }
+        })
+    } // (int) %0-100
+    const [bk3manbantstrt, setBk3manbantstrt] = useState(false);
+    const Bk3manbantstrt = () => setBk3manbantstrt(!bk3manbantstrt); // (bool)
+    const [bk3manbantstp, setBk3manbantstp] = useState(false);
+    const Bk3manbantstp = () => setBk3manbantstp(!bk3manbantstp); // (bool)
+    const [bk3manklpopen, setBk3manklpopen] = useState(false);
+    const Bk3manklpopen = () => setBk3manklpopen(!bk3manklpopen); // (bool)
+    const [bk3manklpclose, setBk3manklpclose] = useState(false);
+    const Bk3manklpclose = () => setBk3manklpclose(!bk3manklpclose); // (bool)
+
+    const [bk4, set4] = useState(false); // (bool) Otomatik/Manuel false-oto 
+    const [bk4autostrt, setBk4autostr] = useState(false);
+    const Bk4autostr = () => setBk4autostr(!bk4autostrt); // (bool)
+    const [bk4autostp, setBk4autostp] = useState(false);
+    const Bk4autostp = () => setBk4autostp(!bk4autostp); // (bool)
+    const [bk4hertz, setBk4hertz] = useState(0);
+    const updateBk4hertz = (e) => {
+        setBk4hertz(e);
+        axios.post(`${ipadress}writePLCDataInts`, {
+            ints: {
+                bk1hertz: bk1hertz,
+                bk2hertz: bk2hertz,
+                bk3hertz: bk3hertz,
+                bk4hertz: e,
+            }
+        })
+    } // (int) %0-100
+    const [bk4manbantstrt, setBk4manbantstrt] = useState(false);
+    const Bk4manbantstrt = () => setBk4manbantstrt(!bk4manbantstrt); // (bool)
+    const [bk4manbantstp, setBk4manbantstp] = useState(false);
+    const Bk4manbantstp = () => setBk4manbantstp(!bk4manbantstp); // (bool)
+    const [bk4manklpopen, setBk4manklpopen] = useState(false);
+    const Bk4manklpopen = () => setBk4manklpopen(!bk4manklpopen); // (bool)
+    const [bk4manklpclose, setBk4manklpclose] = useState(false);
+    const Bk4manklpclose = () => setBk4manklpclose(!bk4manklpclose); // (bool)
+
+    const [faultreset, setDaultreset] = useState(false);
+    const FaultReset = () => setDaultreset(!faultreset);
+
+    const [bell1, setBell1] = useState(false);
+    const [bell2, setBell2] = useState(false);
+    const [bell3, setBell3] = useState(false);
+    const [bell4, setBell4] = useState(false);
+
+    const updatebk1 = () => set1(!bk1); // (bool)
+    const updatebk2 = () => set2(!bk2); // (bool)
+    const updatebk3 = () => set3(!bk3); // (bool)
+    const updatebk4 = () => set4(!bk4); // (bool)
+    const updatebell1 = () => setBell1(!bell1); // (bool)
+    const updatebell2 = () => setBell2(!bell2); // (bool)
+    const updatebell3 = () => setBell3(!bell3); // (bool)
+    const updatebell4 = () => setBell4(!bell4); // (bool)
+
+    const [status1, setStatus1] = useState([]); // (int) 0: Çalışmaya Hazır, 1: Çalıştırılıyor, 2: Çalışıyor, 3: Sürücü Hatası, 4: Çalışma Hatası, 5: İp Çekti Hatası, 6: Acil Stop Basıldı, 7: Bant Hızı Hatası (Devir Bekçisi)
+    const [status2, setStatus2] = useState([]); // (int) 0: Çalışmaya Hazır, 1: Çalıştırılıyor, 2: Çalışıyor, 3: Sürücü Hatası, 4: Çalışma Hatası, 5: İp Çekti Hatası, 6: Acil Stop Basıldı, 7: Bant Hızı Hatası (Devir Bekçisi)
+    const [status3, setStatus3] = useState([]); // (int) 0: Çalışmaya Hazır, 1: Çalıştırılıyor, 2: Çalışıyor, 3: Sürücü Hatası, 4: Çalışma Hatası, 5: İp Çekti Hatası, 6: Acil Stop Basıldı, 7: Bant Hızı Hatası (Devir Bekçisi)
+    const [status4, setStatus4] = useState([]); // (int) 0: Çalışmaya Hazır, 1: Çalıştırılıyor, 2: Çalışıyor, 3: Sürücü Hatası, 4: Çalışma Hatası, 5: İp Çekti Hatası, 6: Acil Stop Basıldı, 7: Bant Hızı Hatası (Devir Bekçisi)
     useEffect(() => {
         const timer = setInterval(() => {
             try {
@@ -235,17 +177,10 @@ function Home() {
                     setCevizseviye(res.data.Ints.cevizseviye)
                     serverconnectionok = true;
                     plcconneectionok = res.data.Connected;
-                    status = res.data.Status;
-                    for (let j = 0; j < status.length; j++) {
-                        const element = status[j];
-                        if (element){
-                            alarms[j].value = true;
-                        }
-                        else{
-                            alarms[j].value = false;
-                        }
-                    }
-                    Alarms();
+                    setStatus1(res.data.Status[0])
+                    setStatus2(res.data.Status[1])
+                    setStatus3(res.data.Status[2])
+                    setStatus4(res.data.Status[3])
                 }).catch(err => {
                     console.log(err)
                     serverconnectionok = false;
@@ -261,6 +196,10 @@ function Home() {
             set2(bb.bools.bk2)
             set3(bb.bools.bk3)
             set4(bb.bools.bk4)
+            setBk1hertz(bb.Ints.Bk1Hertz)
+            setBk2hertz(bb.Ints.Bk2Hertz)
+            setBk3hertz(bb.Ints.Bk3Hertz)
+            setBk4hertz(bb.Ints.Bk4Hertz)
         }).catch(err => {
             console.log(err)
         })
@@ -275,19 +214,48 @@ function Home() {
         axios.post(`${ipadress}writePLCData`, {
             bools: {
                 bk1: bk1,
+                bk1autostrt: bk1autostrt,
+                bk1autostp: bk1autostp,
+                bk1manbantstrt: bk1manbantstrt,
+                bk1manbantstp: bk1manbantstp,
+                bk1manklpopen: bk1manklpopen,
+                bk1manklpclose: bk1manklpclose,
+
                 bk2: bk2,
+                bk2autostrt: bk2autostrt,
+                bk2autostp: bk2autostp,
+                bk2manbantstrt: bk2manbantstrt,
+                bk2manbantstp: bk2manbantstp,
+                bk2manklpopen: bk2manklpopen,
+                bk2manklpclose: bk2manklpclose,
+
                 bk3: bk3,
+                bk3autostrt: bk3autostrt,
+                bk3autostp: bk3autostp,
+                bk3manbantstrt: bk3manbantstrt,
+                bk3manbantstp: bk3manbantstp,
+                bk3manklpopen: bk3manklpopen,
+                bk3manklpclose: bk3manklpclose,
+
                 bk4: bk4,
+                bk4autostrt: bk4autostrt,
+                bk4autostp: bk4autostp,
+                bk4manbantstrt: bk4manbantstrt,
+                bk4manbantstp: bk4manbantstp,
+                bk4manklpopen: bk4manklpopen,
+                bk4manklpclose: bk4manklpclose,
+                
                 bell1: bell1,
                 bell2: bell2,
                 bell3: bell3,
-                bell4: bell4
+                bell4: bell4,
+                faultreset: faultreset,
             },
             ints: {
-                araurunseviye: araurunseviye,
-                tozseviye: tozseviye,
-                findikseviye: findikseviye,
-                cevizseviye: cevizseviye
+                bk1hertz: bk1hertz,
+                bk2hertz: bk2hertz,
+                bk3hertz: bk3hertz,
+                bk4hertz: bk4hertz
             }
         })
     });
@@ -306,6 +274,7 @@ function Home() {
                         {plcconneectionok ? <div className='text-green-500 text-center gap-4 place-items-stretch flex justify-center border border-green-500 rounded' >PLC Bağlantısı Kuruldu <HiOutlineStatusOnline size={25}/>  </div> : <div className='text-red-500 text-center gap-4 place-items-stretch items-center flex justify-center border border-red-500 rounded' > PLC Bağlantısı Koptu <HiOutlineStatusOffline size={25}/></div>}
                     </div>
                     <button className=' bg-green-700 border hover:bg-green-900 border-white rounded flex justify-center' onClick={() => window.location.reload(false)}>BAĞLANTIYI YENILE   <HiRefresh size={25}/></button>
+                    <button className=' bg-gray-700 border hover:bg-yellow-400 hover:scale-110 border-white rounded flex justify-center' onMouseDown={ FaultReset } onMouseUp={ FaultReset }>HATA RESET</button>
                 </div>
             </div>
             <Stack className='absolute top-0 left-0 w-1/4 h-96  m-2'>
@@ -320,7 +289,7 @@ function Home() {
                     <Box sx={{ width: '100%' }}>
                       <LinearProgressWithLabel value={araurunseviye} />
                     </Box>
-                    {bk1 ? <Manual id='1' /> : <Auto id='1' />}
+                    {bk1 ? <Manual id='1' status={status1} setmanbantstrt={Bk1manbantstrt} setmanbantstp={Bk1manbantstp} setmanklpopen={Bk1manklpopen} setmanklpclose={Bk1manklpclose} sethertz={updateBk1hertz} hertz={bk1hertz} /> : <Auto id='1' status={status1} setautostr={Bk1autostr} setautostp={Bk1autostp}/>}
                 </div>
             </Stack>
             <Stack className='absolute top-0 right-0 w-1/4 h-96  m-2'>
@@ -335,7 +304,7 @@ function Home() {
                     <Box sx={{ width: '100%' }}>
                       <LinearProgressWithLabel value={tozseviye} />
                     </Box>
-                    {bk2 ? <Manual id='2' /> : <Auto id='2' />}
+                    {bk2 ? <Manual id='2' status={status2} setmanbantstrt={Bk2manbantstrt} setmanbantstp={Bk2manbantstp} setmanklpopen={Bk2manklpopen} setmanklpclose={Bk2manklpclose} sethertz={updateBk2hertz} hertz={bk2hertz} /> : <Auto id='2' status={status2} setautostr={Bk2autostr} setautostp={Bk2autostp}/>}
                 </div>
             </Stack>
             <Stack className='absolute bottom-0 left-0 w-1/4 h-96  m-2'>
@@ -350,7 +319,7 @@ function Home() {
                     <Box sx={{ width: '100%' }}>
                       <LinearProgressWithLabel value={findikseviye} />
                     </Box>
-                    {bk3 ? <Manual id='3' /> : <Auto id='3' />}
+                    {bk3 ? <Manual id='3' status={status3} setmanbantstrt={Bk3manbantstrt} setmanbantstp={Bk3manbantstp} setmanklpopen={Bk3manklpopen} setmanklpclose={Bk3manklpclose} sethertz={updateBk3hertz} hertz={bk3hertz} /> : <Auto id='3' status={status3} setautostr={Bk3autostr} setautostp={Bk3autostp}/>}
                 </div>
             </Stack>
             <Stack className='absolute bottom-0 right-0 w-1/4 h-96  m-2'>
@@ -365,13 +334,13 @@ function Home() {
                     <Box sx={{ width: '100%' }}>
                       <LinearProgressWithLabel value={cevizseviye} />
                     </Box>
-                    {bk4 ? <Manual id='4' /> : <Auto id='4' />}
+                    {bk4 ? <Manual id='4' status={status4} setmanbantstrt={Bk4manbantstrt} setmanbantstp={Bk4manbantstp} setmanklpopen={Bk4manklpopen} setmanklpclose={Bk4manklpclose} sethertz={updateBk4hertz} hertz={bk4hertz} /> : <Auto id='4' status={status4} setautostr={Bk4autostr} setautostp={Bk4autostp}/>}
                 </div>
             </Stack>
             <div className='absolute rounded bottom-40 left-1/2 transform -translate-x-1/2 -translate-y-1/2 h-64 w-1/3 bg-gray-700  '>
                 <h1 className=' bg-gray-300'><strong>ALARMLAR</strong></h1>
                 <Stack sx={{ width: '100%', height: '30%' }} spacing={1}>
-                    {/* <Alarms/> */}
+                    
                 </Stack>
             </div>
         </div>
@@ -381,22 +350,35 @@ function Home() {
 function Auto(props) {
     return (
         <div className='bg-gray-700 text-white h-auto p-2 rounded '>
-            <ThemeProvider theme={theme}>
-                <div className=' grid grid-cols-2'>
-                    <div>
-                        <TextField id="outlined-basic" label="İstenilen (Ton)" variant="outlined" size='small' color="secondary" sx={{ input: { color: '#ffffff' }, width: 150 }} focused />
-                    </div>
-                    <div>
-                        <TextField id="outlined-basic" label="Yüklenen (Ton)" variant="outlined" size='small' color="secondary" sx={{ input: { color: '#ffffff' }, width: 150 }} focused />
-                    </div>
-                </div>
-            </ThemeProvider>
             <div className=' p-1 m-1 bg-gray-300 rounded text-black'>
                 <h1 className=' bg-gray-500 rounded text-white'>DURUM & KONTROL</h1>
-                <h1 className=' bg-gray-500 rounded gap-2 p-1 m-2 text-white uppercase '>Sıfırlandı</h1>
+                <h1 className=' rounded gap-2 p-1 m-2 text-white uppercase '>
+                    {(() => {
+                      switch (props.status) {
+                        case 0:
+                            return <h1 className=' text-white bg-gray-500 rounded'>Çalışmaya Hazır</h1>;
+                        case 1:
+                            return <h1 className=' text-white bg-yellow-500 rounded'>Çalıştırılıyor</h1>;
+                        case 2:
+                          return <h1 className=' text-white bg-green-500 rounded'>Çalışıyor</h1>;
+                        case 3:
+                            return <h1 className=' text-white bg-red-500 rounded'>Sürücü Hatası</h1>;
+                        case 4:
+                            return <h1 className=' text-white bg-red-500 rounded'>Çalışma Hatası</h1>;
+                        case 5:
+                            return <h1 className=' text-white bg-red-500 rounded'>İp Çekti Hatası</h1>;
+                        case 6:
+                            return <h1 className=' text-white bg-red-500 rounded'>Acil Stop Basıldı</h1>;
+                        case 7:
+                            return <h1 className=' text-white bg-red-500 rounded'>Bant Hızı Hatası (Devir Bekçisi)</h1>;
+                        default:
+                          return 'null';
+                      }
+                    })()}
+                </h1>
                 <div className=' m-1 p-1  grid grid-cols-2 gap-4 place-items-stretch  '>
-                    <Button variant="contained" color="success" >Başlat</Button>
-                    <Button variant="contained" color="error">Durdur</Button>
+                    <Button variant="contained" color="success" onMouseDown={ props.setautostr} onMouseUp={ props.setautostr } >Başlat</Button> 
+                    <Button variant="contained" color="error" onMouseDown={ props.setautostp } onMouseUp={ props.setautostp }>Durdur</Button>
                 </div>
             </div>
         </div>
@@ -404,25 +386,33 @@ function Auto(props) {
 }
 
 function Manual(props) {
+    let value = 0;
     return (
         <div className='bg-gray-700 text-white h-auto p-2 rounded '>
             <ThemeProvider theme={theme}>
-                <div className=' grid grid-cols-2'>
-                    <div>
-                        <TextField id="outlined-basic" label="Bant Hızı (%)" variant="outlined" size='small' color="secondary" sx={{ input: { color: '#ffffff' }, width: 150 }} focused />
-                    </div>
-                    <div>
-                        <TextField id="outlined-basic" label="Yüklenen (Ton)" variant="outlined" size='small' color="secondary" sx={{ input: { color: '#ffffff' }, width: 150 }} focused />
-                    </div>
-                </div>
+                <form>
+                    <TextField defaultValue={props.hertz} id="outlined-basic" type="number" label="Bant Hızı (%) Yazdıktan Sonra Enter'a Bas" variant="outlined" size='small' color="secondary"  sx={{ input: { color: '#ffffff' }, width: 270,  }} inputProps={{min: 0, max:100, style: { textAlign: 'center' }}} focused
+                        onKeyPress={(ev) => {
+                        console.log(ev.target.value);
+                            if (ev.key === 'Enter') {
+                                if (ev.target.value > 100 || ev.target.value < 0) {
+                                    alert('Lütfen 0 ile 100 arasında bir değer giriniz.');
+                                    return;
+                                }
+                                ev.preventDefault();
+                                props.sethertz(ev.target.value);
+                            }
+                        }} 
+                     />
+                </form>
             </ThemeProvider>
             <div className=' p-1 m-1 bg-gray-300 rounded text-black'>
                 <h1 className=' bg-gray-500 rounded text-white'>DURUM & KONTROL</h1>
                 <div className=' m-1 p-1  grid grid-cols-2 gap-4 place-items-stretch  '>
-                    <Button variant="contained" color="success" >Bant Start</Button>
-                    <Button variant="contained" color="error">Bant Stop</Button>
-                    <Button variant="contained" color="success" >Klape Aç</Button>
-                    <Button variant="contained" color="error">Klape Kapat</Button>
+                    <Button onMouseDown={ props.setmanbantstrt} onMouseUp={ props.setmanbantstrt } variant="contained" color="success" >Bant Start</Button>
+                    <Button onMouseDown={ props.setmanbantstp} onMouseUp={ props.setmanbantstp } variant="contained" color="error">Bant Stop</Button>
+                    <Button onMouseDown={ props.setmanklpopen} onMouseUp={ props.setmanklpopen } variant="contained" color="success" >Klape Aç</Button>
+                    <Button onMouseDown={ props.setmanklpclose} onMouseUp={ props.setmanklpclose } variant="contained" color="error">Klape Kapat</Button>
                 </div>
             </div>
         </div>
@@ -443,21 +433,6 @@ function LinearProgressWithLabel(props) {
             </Box>
         </div>
     );
-}
-let array = []
-setInterval(() => {
-    for (let k = 0; k < 30; k++) {
-        const element = array[k];
-        array.push({
-            text: 'Uyarı',
-            value: false
-        })
-    }
-    console.log(array)
-} , 1000)
-
-function Alarms(props) {
-    
 }
 
 LinearProgressWithLabel.propTypes = {

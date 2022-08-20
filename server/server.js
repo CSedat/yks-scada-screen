@@ -75,9 +75,11 @@ var doneReading = false;
 var doneWriting = true;
 
 var variables = {
-    Bits: 'DB200,X0.0.21',
-    Ints: 'DB200,INT4.5',
-    Status: 'DB200,X46.0.31',
+    Bits: 'DB200,X8.0.40',
+    OnlyReadInts: 'DB200,INT0.4',
+    WriteInts: 'DB200,INT14.4',
+    Status: 'DB200,INT22.31',
+    Alarms: 'DB200,X84.0.31',
 };
 
 conn.initiateConnection({ port: 102, 
@@ -96,30 +98,62 @@ app.post("/writePLCData", function (req, res) {
     if (doneWriting) {
         conn.writeItems('Bits', [
             writeplcdata.bools.bk1,
-            writeplcdata.bools.bk2,
+            writeplcdata.bools.bk1autostrt,
+            writeplcdata.bools.bk1autostp ,
+            writeplcdata.bools.bk1manbantstrt,
+            writeplcdata.bools.bk1manbantstp ,
+            writeplcdata.bools.bk1manklpopen ,
+            writeplcdata.bools.bk1manklpclose,
+
+            writeplcdata.bools.bk2 ,
+            writeplcdata.bools.bk2autostrt ,
+            writeplcdata.bools.bk2autostp ,
+            writeplcdata.bools.bk2manbantstrt,
+            writeplcdata.bools.bk2manbantstp ,
+            writeplcdata.bools.bk2manklpopen ,
+            writeplcdata.bools.bk2manklpclose,
+
             writeplcdata.bools.bk3,
+            writeplcdata.bools.bk3autostrt,
+            writeplcdata.bools.bk3autostp,
+            writeplcdata.bools.bk3manbantstrt,
+            writeplcdata.bools.bk3manbantstp,
+            writeplcdata.bools.bk3manklpopen,
+            writeplcdata.bools.bk3manklpclose,
+
             writeplcdata.bools.bk4,
+            writeplcdata.bools.bk4autostrt,
+            writeplcdata.bools.bk4autostp,
+            writeplcdata.bools.bk4manbantstrt,
+            writeplcdata.bools.bk4manbantstp,
+            writeplcdata.bools.bk4manklpopen,
+            writeplcdata.bools.bk4manklpclose,
+
             writeplcdata.bools.bell1,
             writeplcdata.bools.bell2,
             writeplcdata.bools.bell3,
             writeplcdata.bools.bell4,
-            writeplcdata.bools.spare1,
-            writeplcdata.bools.spare2,
-            writeplcdata.bools.spare3,
-            writeplcdata.bools.spare4,
-            writeplcdata.bools.spare5,
-            writeplcdata.bools.spare6,
-            writeplcdata.bools.spare7,
-            writeplcdata.bools.spare8,
-            writeplcdata.bools.spare9,
-            writeplcdata.bools.spare10,
-            writeplcdata.bools.spare11,
-            writeplcdata.bools.spare12,
-          ], valuesWritten);
-        }
+            writeplcdata.bools.faultreset,
+        ], valuesWritten);
+    }
     res.send("ok");
     res.end();
-    // console.log(writeplcdata)
+});
+
+app.post("/writePLCDataInts", function (req, res) {
+    writeplcdata = req.body;
+    console.log(doneWriting)
+    if (doneWriting) {
+        conn.writeItems('WriteInts', [
+            writeplcdata.ints.bk1hertz,
+            writeplcdata.ints.bk2hertz,
+            writeplcdata.ints.bk3hertz,
+            writeplcdata.ints.bk4hertz,
+        ], valuesWritten);
+    }
+        
+    res.send("ok");
+    res.end();
 });
 
 app.get('/getPLCData', function (req, res) {
@@ -133,7 +167,7 @@ function connected(err) {
     //   process.exit();
     }
     conn.setTranslationCB(function(tag) { return variables[tag]; }); // This sets the "translation" to allow us to work with object names
-    conn.addItems(['Bits', 'Ints', 'Status']);
+    conn.addItems(['Bits', 'OnlyReadInts', 'WriteInts', 'Status', 'Alarms']);
     conn.readAllItems(valuesReady);
 }
 
@@ -142,35 +176,53 @@ function valuesReady(err, values) {
     readplcdata = {
         bools: {
             bk1: values.Bits[0],
-            bk2: values.Bits[1],
-            bk3: values.Bits[2],
-            bk4: values.Bits[3],
-            bell1: values.Bits[4],
-            bell2: values.Bits[5],
-            bell3: values.Bits[6],
-            bell4: values.Bits[7],
-            spare1: values.Bits[8],
-            spare2: values.Bits[9],
-            spare3: values.Bits[10],
-            spare4: values.Bits[11],
-            spare5: values.Bits[12],
-            spare6: values.Bits[13],
-            spare7: values.Bits[14],
-            spare8: values.Bits[15],
-            spare9: values.Bits[16],
-            spare10: values.Bits[17],
-            spare11: values.Bits[18],
-            spare12: values.Bits[19],
+            bk1autostrt: values.Bits[1],
+            bk1autostp : values.Bits[2],
+            bk1manbantstrt: values.Bits[3],
+            bk1manbantstp : values.Bits[4],
+            bk1manklpopen : values.Bits[5],
+            bk1manklpclose: values.Bits[6],
+            bk2 : values.Bits[7],
+            bk2autostrt : values.Bits[8],
+            bk2autostp : values.Bits[9],
+            bk2manbantstrt: values.Bits[10],
+            bk2manbantstp : values.Bits[11],
+            bk2manklpopen : values.Bits[12],
+            bk2manklpclose: values.Bits[13],
+            bk3: values.Bits[14],
+            bk3autostrt: values.Bits[15],
+            bk3autostp: values.Bits[16],
+            bk3manbantstrt: values.Bits[17],
+            bk3manbantstp: values.Bits[18],
+            bk3manklpopen: values.Bits[19],
+            bk3manklpclose: values.Bits[20],
+            bk4: values.Bits[21],
+            bk4autostrt: values.Bits[22],
+            bk4autostp: values.Bits[23],
+            bk4manbantstrt: values.Bits[24],
+            bk4manbantstp: values.Bits[25],
+            bk4manklpopen: values.Bits[26],
+            bk4manklpclose: values.Bits[27],
+            bell1: values.Bits[28],
+            bell2: values.Bits[29],
+            bell3: values.Bits[30],
+            bell4: values.Bits[31],
+            faultreset: values.Bits[32],
         },
         Ints: {
-            araurunseviye: values.Ints[0],
-            tozseviye: values.Ints[1],
-            findikseviye: values.Ints[2],
-            cevizseviye: values.Ints[3],
-            int5: values.Ints[4],
+            araurunseviye: values.OnlyReadInts[0],
+            tozseviye: values.OnlyReadInts[1],
+            findikseviye: values.OnlyReadInts[2],
+            cevizseviye: values.OnlyReadInts[3],
+            Bk1Hertz: values.WriteInts[0],
+            Bk2Hertz: values.WriteInts[1],
+            Bk3Hertz: values.WriteInts[2],
+            Bk4Hertz: values.WriteInts[3],
         },
+        
         Connected: PLCconnected,
         Status: values.Status,
+        Alarms: values.Alarms,
     };
     doneReading = true;
     // if (doneWriting) { conn.readAllItems(valuesReady); }
