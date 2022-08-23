@@ -13,6 +13,7 @@ import { HiOutlineStatusOnline, HiOutlineStatusOffline, HiRefresh } from "react-
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import logo from '../assests/polyakeynez.png'
 import axios from 'axios';
+import { motion } from "framer-motion"
 
 
 const ipadress = 'http://localhost:8001/';
@@ -167,6 +168,14 @@ function Home() {
     const [status2, setStatus2] = useState([]); // (int) 0: Çalışmaya Hazır, 1: Çalıştırılıyor, 2: Çalışıyor, 3: Sürücü Hatası, 4: Çalışma Hatası, 5: İp Çekti Hatası, 6: Acil Stop Basıldı, 7: Bant Hızı Hatası (Devir Bekçisi)
     const [status3, setStatus3] = useState([]); // (int) 0: Çalışmaya Hazır, 1: Çalıştırılıyor, 2: Çalışıyor, 3: Sürücü Hatası, 4: Çalışma Hatası, 5: İp Çekti Hatası, 6: Acil Stop Basıldı, 7: Bant Hızı Hatası (Devir Bekçisi)
     const [status4, setStatus4] = useState([]); // (int) 0: Çalışmaya Hazır, 1: Çalıştırılıyor, 2: Çalışıyor, 3: Sürücü Hatası, 4: Çalışma Hatası, 5: İp Çekti Hatası, 6: Acil Stop Basıldı, 7: Bant Hızı Hatası (Devir Bekçisi)
+    const [d709status, setD709Status] = useState([]); // (int) 0: Çalışmaya Hazır, 1: Çalıştırılıyor, 2: Çalışıyor, 3: Sürücü Hatası, 4: Çalışma Hatası, 5: İp Çekti Hatası, 6: Acil Stop Basıldı, 7: Bant Hızı Hatası (Devir Bekçisi)
+
+    const [d709, setd709] = useState(false); 
+    const updated709 = () => setd709(!d709);
+    const [d709start, setd709start] = useState(false);
+    const d709strt = () => setd709start(!d709start); // (bool)
+    const [d709stop, setd709stop] = useState(false);
+    const d709stp = () => setd709stop(!d709stop); // (bool)
     useEffect(() => {
         const timer = setInterval(() => {
             try {
@@ -181,6 +190,7 @@ function Home() {
                     setStatus2(res.data.Status[1])
                     setStatus3(res.data.Status[2])
                     setStatus4(res.data.Status[3])
+                    setD709Status(res.data.Status[4])
                 }).catch(err => {
                     console.log(err)
                     serverconnectionok = false;
@@ -196,6 +206,7 @@ function Home() {
             set2(bb.bools.bk2)
             set3(bb.bools.bk3)
             set4(bb.bools.bk4)
+            setd709(bb.bools.d709)
             setBk1hertz(bb.Ints.Bk1Hertz)
             setBk2hertz(bb.Ints.Bk2Hertz)
             setBk3hertz(bb.Ints.Bk3Hertz)
@@ -244,6 +255,10 @@ function Home() {
                 bk4manbantstp: bk4manbantstp,
                 bk4manklpopen: bk4manklpopen,
                 bk4manklpclose: bk4manklpclose,
+
+                d709: d709,
+                d709start: d709start,
+                d709stop: d709stop,
                 
                 bell1: bell1,
                 bell2: bell2,
@@ -337,26 +352,153 @@ function Home() {
                     {bk4 ? <Manual id='4' status={status4} setmanbantstrt={Bk4manbantstrt} setmanbantstp={Bk4manbantstp} setmanklpopen={Bk4manklpopen} setmanklpclose={Bk4manklpclose} sethertz={updateBk4hertz} hertz={bk4hertz} /> : <Auto id='4' status={status4} setautostr={Bk4autostr} setautostp={Bk4autostp}/>}
                 </div>
             </Stack>
-            <div className='absolute rounded bottom-40 left-1/2 transform -translate-x-1/2 -translate-y-1/2 h-64 w-1/3 bg-gray-700  '>
-                <h1 className=' bg-gray-300'><strong>ALARMLAR</strong></h1>
-                <Stack sx={{ width: '100%', height: '30%' }} spacing={1}>
-                    
-                </Stack>
-            </div>
+            <Stack className='absolute w-96 h-40 rounded bottom-40 left-1/2 transform -translate-x-1/2 -translate-y-1/2'>
+                <div className='bg-gray-300 rounded max-h-16 text-black justify-center items-center text-center'>
+                    <div className='flex items-center justify-center text-black'>
+                        <h1 className='absolute left-0 m-2 p-1 bg-yellow-500 rounded'>D709 BANT</h1>
+                        <Typography>Local</Typography>
+                        <Switch onChange={updated709} checked={d709} inputProps={{ 'aria-label': 'ant design' }} />
+                        <Typography>Remote</Typography>
+                    </div>
+                    {d709 ? <div className='bg-gray-700 text-white h-auto p-2 rounded '>
+                        <div className=' p-1 m-1 bg-gray-300 rounded text-black'>
+                            <h1 className=' bg-gray-500 rounded text-white'>DURUM & KONTROL</h1>
+                            <h1 className=' rounded gap-2 p-1 m-2 text-white uppercase '>
+                                {(() => {
+                                  switch (d709status) {
+                                    case 1:
+                                        return <h1 className=' text-white bg-green-500 rounded'>Çalışıyor</h1>;
+                                    case 2:
+                                      return <h1 className=' text-white bg-gray-500 rounded'>Çalışmaya Hazır</h1>;
+                                    case 3:
+                                        return <h1 className=' text-white bg-red-500 rounded'>Acil Stop Basıldı</h1>;
+                                    case 4:
+                                        return <h1 className=' text-white bg-red-500 rounded'>Modül Hatası(Aşırı Akım)</h1>;
+                                    default:
+                                      return 'null';
+                                  }
+                                })()}
+                            </h1>
+
+                            <div className=' m-1 p-1  grid grid-cols-2 gap-4 place-items-stretch  '>
+                                <Button variant="contained" color="success" onMouseDown={ d709strt } onMouseUp={ d709strt } >Başlat</Button> 
+                                <Button variant="contained" color="error" onMouseDown={ d709stp } onMouseUp={ d709stp } >Durdur</Button>
+                            </div>
+                        </div>
+                    </div> 
+                    : 
+                    <div>
+                        Local Mod Aktif
+                        <div className=' p-1 m-1 bg-gray-300 rounded text-black'>
+                            <h1 className=' bg-gray-500 rounded text-white'>DURUM & KONTROL</h1>
+                            <h1 className=' rounded gap-2 p-1 m-2 text-white uppercase '>
+                                {(() => {
+                                  switch (d709status) {
+                                    case 1:
+                                        return <h1 className=' text-white bg-green-500 rounded'>Çalışıyor</h1>;
+                                    case 2:
+                                      return <h1 className=' text-white bg-gray-500 rounded'>Çalışmaya Hazır</h1>;
+                                    case 3:
+                                        return <h1 className=' text-white bg-red-500 rounded'>Acil Stop Basıldı</h1>;
+                                    case 4:
+                                        return <h1 className=' text-white bg-red-500 rounded'>Modül Hatası(Aşırı Akım)</h1>;
+                                    default:
+                                      return 'null';
+                                  }
+                                })()}
+                            </h1>
+                        </div>
+                    </div>}
+                </div>
+            </Stack>
+            
         </div>
     )
 }
 
 function Auto(props) {
     return (
+        <div>
+
+            <div className='bg-gray-700 text-white h-auto p-2 rounded '>
+                <div className=' p-1 m-1 bg-gray-300 rounded text-black'>
+                    <h1 className=' bg-gray-500 rounded text-white'>DURUM & KONTROL</h1>
+                    <h1 className=' rounded gap-2 p-1 m-2 text-white uppercase '>
+                        {(() => {
+                        switch (props.status) {
+                            case 0:
+                                return <h1 className=' text-white bg-blue-500 rounded'>Çalışmaya Hazır</h1>;
+                            case 1:
+                                return <h1 className=' text-white bg-yellow-500 rounded'>Çalıştırılıyor</h1>;
+                            case 2:
+                                return <h1 className=' text-white bg-green-500 rounded'>Çalışıyor</h1>;
+                            case 3:
+                                return <h1 className=' text-white bg-red-500 rounded'>Sürücü Hatası</h1>;
+                            case 4:
+                                return <h1 className=' text-white bg-red-500 rounded'>Çalışma Hatası</h1>;
+                            case 5:
+                                return <h1 className=' text-white bg-red-500 rounded'>İp Çekti Hatası</h1>;
+                            case 6:
+                                return <h1 className=' text-white bg-red-500 rounded'>Acil Stop Basıldı</h1>;
+                            case 7:
+                                return <h1 className=' text-white bg-red-500 rounded'>Bant Hızı Hatası (Devir Bekçisi)</h1>;
+                            default:
+                            return 'null';
+                        }
+                        })()}
+                    </h1>
+                    <div className=' m-1 p-1  grid grid-cols-2 gap-4 place-items-stretch  '>
+                        <Button variant="contained" color="success" onMouseDown={ props.setautostr} onMouseUp={ props.setautostr } >Başlat</Button> 
+                        <Button variant="contained" color="error" onMouseDown={ props.setautostp } onMouseUp={ props.setautostp }>Durdur</Button>
+                    </div>
+                </div>
+                
+            </div>
+            <div className=' grid grid-flow-col gap-4 border rounded justify-center items-center  h-10 '>
+
+                <motion.div
+                    animate={{ rotate: props.status == 2 ? 360 : 0 }}
+                    transition={{ ease: "linear", duration: 1, repeat: Infinity }}
+                    className=' from-black bg-gradient-to-r to-white h-10 w-10 rounded-full flex items-center justify-center '
+                ></motion.div>    
+                <motion.div
+                    animate={{ rotate: props.status == 2 ? 360 : 0 }}
+                    transition={{ ease: "linear", duration: 1, repeat: Infinity }}
+                    className=' from-red-500 bg-gradient-to-r to-blue-500 h-10 w-10 rounded-full flex items-center justify-center '
+                ></motion.div>
+            </div>
+        </div>
+    )
+}
+
+function Manual(props) {
+    return (
         <div className='bg-gray-700 text-white h-auto p-2 rounded '>
+            <ThemeProvider theme={theme}>
+                <form>
+                    <TextField defaultValue={props.hertz} id="outlined-basic" type="number" label="Bant Hızı (%) Yazdıktan Sonra Enter'a Bas" variant="outlined" size='small' color="secondary"  sx={{ input: { color: '#ffffff' }, width: 270,  }} inputProps={{min: 0, max:100, style: { textAlign: 'center' }}} focused
+                        onKeyPress={(ev) => {
+                        console.log(ev.target.value);
+                            if (ev.key === 'Enter') {
+                                if (ev.target.value > 100 || ev.target.value < 0) {
+                                    alert('Lütfen 0 ile 100 arasında bir değer giriniz.');
+                                    return;
+                                }
+                                ev.preventDefault();
+                                props.sethertz(ev.target.value);
+                            }
+                        }} 
+                        
+                    />
+                </form>
+            </ThemeProvider>
             <div className=' p-1 m-1 bg-gray-300 rounded text-black'>
                 <h1 className=' bg-gray-500 rounded text-white'>DURUM & KONTROL</h1>
                 <h1 className=' rounded gap-2 p-1 m-2 text-white uppercase '>
                     {(() => {
                       switch (props.status) {
                         case 0:
-                            return <h1 className=' text-white bg-gray-500 rounded'>Çalışmaya Hazır</h1>;
+                            return <h1 className=' text-white bg-blue-500 rounded'>Çalışmaya Hazır</h1>;
                         case 1:
                             return <h1 className=' text-white bg-yellow-500 rounded'>Çalıştırılıyor</h1>;
                         case 2:
@@ -376,38 +518,6 @@ function Auto(props) {
                       }
                     })()}
                 </h1>
-                <div className=' m-1 p-1  grid grid-cols-2 gap-4 place-items-stretch  '>
-                    <Button variant="contained" color="success" onMouseDown={ props.setautostr} onMouseUp={ props.setautostr } >Başlat</Button> 
-                    <Button variant="contained" color="error" onMouseDown={ props.setautostp } onMouseUp={ props.setautostp }>Durdur</Button>
-                </div>
-            </div>
-        </div>
-    )
-}
-
-function Manual(props) {
-    let value = 0;
-    return (
-        <div className='bg-gray-700 text-white h-auto p-2 rounded '>
-            <ThemeProvider theme={theme}>
-                <form>
-                    <TextField defaultValue={props.hertz} id="outlined-basic" type="number" label="Bant Hızı (%) Yazdıktan Sonra Enter'a Bas" variant="outlined" size='small' color="secondary"  sx={{ input: { color: '#ffffff' }, width: 270,  }} inputProps={{min: 0, max:100, style: { textAlign: 'center' }}} focused
-                        onKeyPress={(ev) => {
-                        console.log(ev.target.value);
-                            if (ev.key === 'Enter') {
-                                if (ev.target.value > 100 || ev.target.value < 0) {
-                                    alert('Lütfen 0 ile 100 arasında bir değer giriniz.');
-                                    return;
-                                }
-                                ev.preventDefault();
-                                props.sethertz(ev.target.value);
-                            }
-                        }} 
-                     />
-                </form>
-            </ThemeProvider>
-            <div className=' p-1 m-1 bg-gray-300 rounded text-black'>
-                <h1 className=' bg-gray-500 rounded text-white'>DURUM & KONTROL</h1>
                 <div className=' m-1 p-1  grid grid-cols-2 gap-4 place-items-stretch  '>
                     <Button onMouseDown={ props.setmanbantstrt} onMouseUp={ props.setmanbantstrt } variant="contained" color="success" >Bant Start</Button>
                     <Button onMouseDown={ props.setmanbantstp} onMouseUp={ props.setmanbantstp } variant="contained" color="error">Bant Stop</Button>

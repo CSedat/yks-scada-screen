@@ -129,6 +129,10 @@ app.post("/writePLCData", function (req, res) {
             writeplcdata.bools.bk4manklpopen,
             writeplcdata.bools.bk4manklpclose,
 
+            writeplcdata.bools.d709,
+            writeplcdata.bools.d709start,
+            writeplcdata.bools.d709stop,
+
             writeplcdata.bools.bell1,
             writeplcdata.bools.bell2,
             writeplcdata.bools.bell3,
@@ -159,6 +163,7 @@ app.post("/writePLCDataInts", function (req, res) {
 app.get('/getPLCData', function (req, res) {
     conn.readAllItems(valuesReady);
     res.send(readplcdata);
+    
 });
 
 function connected(err) {
