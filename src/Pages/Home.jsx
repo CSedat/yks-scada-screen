@@ -452,21 +452,21 @@ function Auto(props) {
                         <Button variant="contained" color="error" onMouseDown={ props.setautostp } onMouseUp={ props.setautostp }>Durdur</Button>
                     </div>
                 </div>
-                
             </div>
-            <div className=' grid grid-flow-col gap-4 border rounded justify-center items-center  h-10 '>
+            <motion.div className=' first-letter:relative border border-dashed rounded-3xl justfliy-between h-[2.6rem] m-2  '
+            >
 
                 <motion.div
-                    animate={{ rotate: props.status == 2 ? 360 : 0 }}
+                    animate={{ rotate: true ? 360 : 0 }}
                     transition={{ ease: "linear", duration: 1, repeat: Infinity }}
-                    className=' from-black bg-gradient-to-r to-white h-10 w-10 rounded-full flex items-center justify-center '
-                ></motion.div>    
-                <motion.div
-                    animate={{ rotate: props.status == 2 ? 360 : 0 }}
-                    transition={{ ease: "linear", duration: 1, repeat: Infinity }}
-                    className=' from-red-500 bg-gradient-to-r to-blue-500 h-10 w-10 rounded-full flex items-center justify-center '
+                    className=' from-green-700 bg-gradient-to-r to-yellow-400 h-10 w-10 rounded-full absolute left-0'
                 ></motion.div>
-            </div>
+                <motion.div
+                    animate={{ rotate: true ? 360 : 0 }}
+                    transition={{ ease: "linear", duration: 1, repeat: Infinity }}
+                    className=' from-green-700 bg-gradient-to-r to-yellow-400 h-10 w-10 rounded-full absolute right-0 '
+                ></motion.div>
+            </motion.div>
         </div>
     )
 }
