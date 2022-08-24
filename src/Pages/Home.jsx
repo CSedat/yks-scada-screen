@@ -12,8 +12,11 @@ import { FaBell } from 'react-icons/fa';
 import { HiOutlineStatusOnline, HiOutlineStatusOffline, HiRefresh } from "react-icons/hi";
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import logo from '../assests/polyakeynez.png'
+import gray_belt_conveyor from '../assests/gray_belt_conveyor.svg';
+import red_belt_conveyor from '../assests/red_belt_conveyor.svg';
+import green_belt_conveyor from '../assests/green_belt_conveyor.svg';
+import yellow_belt_conveyor from '../assests/yellow_belt_conveyor.svg';
 import axios from 'axios';
-import { motion } from "framer-motion"
 
 
 const ipadress = 'http://localhost:8001/';
@@ -36,6 +39,7 @@ const theme = createTheme({
 });
 
 function Home() {
+
     const [araurunseviye, setAraurunseviye] = useState(10);
     const [tozseviye, setTozseviye] = useState(20);
     const [findikseviye, setFindikseviye] = useState(30);
@@ -322,7 +326,7 @@ function Home() {
                     {bk2 ? <Manual id='2' status={status2} setmanbantstrt={Bk2manbantstrt} setmanbantstp={Bk2manbantstp} setmanklpopen={Bk2manklpopen} setmanklpclose={Bk2manklpclose} sethertz={updateBk2hertz} hertz={bk2hertz} /> : <Auto id='2' status={status2} setautostr={Bk2autostr} setautostp={Bk2autostp}/>}
                 </div>
             </Stack>
-            <Stack className='absolute bottom-0 left-0 w-1/4 h-96  m-2'>
+            <Stack className='absolute bottom-0 left-0 w-1/4 h-[28rem]  m-2'>
                 <div className='bg-gray-300 rounded max-h-16 text-black justify-center items-center text-center'>
                     <div className='flex items-center justify-center text-black'>
                         <h1 className='absolute left-0 m-2 p-1 bg-yellow-500 rounded'>BK-03 FINDIK</h1>
@@ -337,7 +341,7 @@ function Home() {
                     {bk3 ? <Manual id='3' status={status3} setmanbantstrt={Bk3manbantstrt} setmanbantstp={Bk3manbantstp} setmanklpopen={Bk3manklpopen} setmanklpclose={Bk3manklpclose} sethertz={updateBk3hertz} hertz={bk3hertz} /> : <Auto id='3' status={status3} setautostr={Bk3autostr} setautostp={Bk3autostp}/>}
                 </div>
             </Stack>
-            <Stack className='absolute bottom-0 right-0 w-1/4 h-96  m-2'>
+            <Stack className='absolute bottom-0 right-0 w-1/4 h-[28rem] m-2'>
                 <div className='bg-gray-300 rounded max-h-16 text-black justify-center items-center text-center'>
                     <div className='flex items-center justify-center text-black'>
                         <h1 className='absolute left-0 m-2 p-1 bg-yellow-500 rounded'>BK-04 CEVİZ</h1>
@@ -453,78 +457,116 @@ function Auto(props) {
                     </div>
                 </div>
             </div>
-            <motion.div className=' first-letter:relative border border-dashed rounded-3xl justfliy-between h-[2.6rem] m-2  '
-            >
-
-                <motion.div
-                    animate={{ rotate: true ? 360 : 0 }}
-                    transition={{ ease: "linear", duration: 1, repeat: Infinity }}
-                    className=' from-green-700 bg-gradient-to-r to-yellow-400 h-10 w-10 rounded-full absolute left-0'
-                ></motion.div>
-                <motion.div
-                    animate={{ rotate: true ? 360 : 0 }}
-                    transition={{ ease: "linear", duration: 1, repeat: Infinity }}
-                    className=' from-green-700 bg-gradient-to-r to-yellow-400 h-10 w-10 rounded-full absolute right-0 '
-                ></motion.div>
-            </motion.div>
+            <BeltConveyor status={props.status} id={props.id} />
         </div>
     )
 }
 
 function Manual(props) {
     return (
-        <div className='bg-gray-700 text-white h-auto p-2 rounded '>
-            <ThemeProvider theme={theme}>
-                <form>
-                    <TextField defaultValue={props.hertz} id="outlined-basic" type="number" label="Bant Hızı (%) Yazdıktan Sonra Enter'a Bas" variant="outlined" size='small' color="secondary"  sx={{ input: { color: '#ffffff' }, width: 270,  }} inputProps={{min: 0, max:100, style: { textAlign: 'center' }}} focused
-                        onKeyPress={(ev) => {
-                        console.log(ev.target.value);
-                            if (ev.key === 'Enter') {
-                                if (ev.target.value > 100 || ev.target.value < 0) {
-                                    alert('Lütfen 0 ile 100 arasında bir değer giriniz.');
-                                    return;
+        <div>
+            <div className='bg-gray-700 text-white  p-2 rounded '>
+                <ThemeProvider theme={theme}>
+                    <form>
+                        <TextField defaultValue={props.hertz} id="outlined-basic" type="number" label="Bant Hızı (%) Yazdıktan Sonra Enter'a Bas" variant="outlined" size='small' color="secondary"  sx={{ input: { color: '#ffffff' }, width: 270,  }} inputProps={{min: 0, max:100, style: { textAlign: 'center' }}} focused
+                            onKeyPress={(ev) => {
+                            console.log(ev.target.value);
+                                if (ev.key === 'Enter') {
+                                    if (ev.target.value > 100 || ev.target.value < 0) {
+                                        alert('Lütfen 0 ile 100 arasında bir değer giriniz.');
+                                        return;
+                                    }
+                                    ev.preventDefault();
+                                    props.sethertz(ev.target.value);
                                 }
-                                ev.preventDefault();
-                                props.sethertz(ev.target.value);
-                            }
-                        }} 
-                        
-                    />
-                </form>
-            </ThemeProvider>
-            <div className=' p-1 m-1 bg-gray-300 rounded text-black'>
-                <h1 className=' bg-gray-500 rounded text-white'>DURUM & KONTROL</h1>
-                <h1 className=' rounded gap-2 p-1 m-2 text-white uppercase '>
-                    {(() => {
-                      switch (props.status) {
-                        case 0:
-                            return <h1 className=' text-white bg-blue-500 rounded'>Çalışmaya Hazır</h1>;
-                        case 1:
-                            return <h1 className=' text-white bg-yellow-500 rounded'>Çalıştırılıyor</h1>;
-                        case 2:
-                          return <h1 className=' text-white bg-green-500 rounded'>Çalışıyor</h1>;
-                        case 3:
-                            return <h1 className=' text-white bg-red-500 rounded'>Sürücü Hatası</h1>;
-                        case 4:
-                            return <h1 className=' text-white bg-red-500 rounded'>Çalışma Hatası</h1>;
-                        case 5:
-                            return <h1 className=' text-white bg-red-500 rounded'>İp Çekti Hatası</h1>;
-                        case 6:
-                            return <h1 className=' text-white bg-red-500 rounded'>Acil Stop Basıldı</h1>;
-                        case 7:
-                            return <h1 className=' text-white bg-red-500 rounded'>Bant Hızı Hatası (Devir Bekçisi)</h1>;
-                        default:
-                          return 'null';
-                      }
-                    })()}
-                </h1>
-                <div className=' m-1 p-1  grid grid-cols-2 gap-4 place-items-stretch  '>
-                    <Button onMouseDown={ props.setmanbantstrt} onMouseUp={ props.setmanbantstrt } variant="contained" color="success" >Bant Start</Button>
-                    <Button onMouseDown={ props.setmanbantstp} onMouseUp={ props.setmanbantstp } variant="contained" color="error">Bant Stop</Button>
-                    <Button onMouseDown={ props.setmanklpopen} onMouseUp={ props.setmanklpopen } variant="contained" color="success" >Klape Aç</Button>
-                    <Button onMouseDown={ props.setmanklpclose} onMouseUp={ props.setmanklpclose } variant="contained" color="error">Klape Kapat</Button>
+                            }} 
+                            
+                        />
+                    </form>
+                </ThemeProvider>
+                <div className=' p-1 m-1 bg-gray-300 rounded text-black'>
+                    <h1 className=' bg-gray-500 rounded text-white'>DURUM & KONTROL</h1>
+                    <h1 className=' rounded gap-2 p-1 m-2 text-white uppercase '>
+                        {(() => {
+                        switch (props.status) {
+                            case 0:
+                                return <h1 className=' text-white bg-blue-500 rounded'>Çalışmaya Hazır</h1>;
+                            case 1:
+                                return <h1 className=' text-white bg-yellow-500 rounded'>Çalıştırılıyor</h1>;
+                            case 2:
+                            return <h1 className=' text-white bg-green-500 rounded'>Çalışıyor</h1>;
+                            case 3:
+                                return <h1 className=' text-white bg-red-500 rounded'>Sürücü Hatası</h1>;
+                            case 4:
+                                return <h1 className=' text-white bg-red-500 rounded'>Çalışma Hatası</h1>;
+                            case 5:
+                                return <h1 className=' text-white bg-red-500 rounded'>İp Çekti Hatası</h1>;
+                            case 6:
+                                return <h1 className=' text-white bg-red-500 rounded'>Acil Stop Basıldı</h1>;
+                            case 7:
+                                return <h1 className=' text-white bg-red-500 rounded'>Bant Hızı Hatası (Devir Bekçisi)</h1>;
+                            default:
+                            return 'null';
+                        }
+                        })()}
+                    </h1>
+                    <div className=' m-1 p-1  grid grid-cols-2 gap-4 place-items-stretch  '>
+                        <Button onMouseDown={ props.setmanbantstrt} onMouseUp={ props.setmanbantstrt } variant="contained" color="success" >Bant Start</Button>
+                        <Button onMouseDown={ props.setmanbantstp} onMouseUp={ props.setmanbantstp } variant="contained" color="error">Bant Stop</Button>
+                        <Button onMouseDown={ props.setmanklpopen} onMouseUp={ props.setmanklpopen } variant="contained" color="success" >Klape Aç</Button>
+                        <Button onMouseDown={ props.setmanklpclose} onMouseUp={ props.setmanklpclose } variant="contained" color="error">Klape Kapat</Button>
+                    </div>
                 </div>
             </div>
+            <BeltConveyor status={props.status} id={props.id} />
+        </div>
+    )
+}
+
+function BeltConveyor(props){
+    return(
+        <div className=' relative border border-dashed rounded-3xl justfliy-between h-[2.40rem] m-4  '>
+            {(() => {
+                switch (props.status) {
+                    case 0:
+                        return <div className=' relative'>
+                            <div className=' h-9 w-9 rounded-full absolute left-0'>
+                                <img src={gray_belt_conveyor} alt="" />
+                            </div>
+                            <div className=' h-9 w-9 rounded-full absolute right-0 '>
+                                <img src={gray_belt_conveyor} alt="" />
+                            </div>
+                        </div>
+                    case 1:
+                        return <div>
+                            <div className=' h-9 w-9 rounded-full absolute left-0'>
+                                <img src={yellow_belt_conveyor} alt="" /> 
+                            </div>
+                            <div className=' h-9 w-9 rounded-full absolute right-0 '>
+                                <img src={yellow_belt_conveyor} alt="" />
+                            </div>
+                        </div>
+                    case 2:
+                        return <div>
+                            <div className=' animate-spin  h-9 w-9 rounded-full absolute left-0'>
+                                <img src={green_belt_conveyor} alt="" /> 
+                            </div>
+                            <div className=' animate-spin  h-9 w-9 rounded-full absolute right-0 '>
+                                <img src={green_belt_conveyor} alt="" /> 
+                            </div>
+                        </div>
+                    default:
+                    return <div>
+                        <div className=' h-9 w-9 rounded-full absolute left-0'>
+                            <img src={red_belt_conveyor} alt="" /> 
+                        </div>
+                        <div className=' h-9 w-9 rounded-full absolute right-0 '>
+                            <img src={red_belt_conveyor} alt="" /> 
+                        </div>
+                    </div>
+                }
+            })()}
+            <div className=' text-center items-center justify-center p-1 text-white font-semibold '>BK-{props.id}</div>
         </div>
     )
 }
