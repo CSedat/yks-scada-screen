@@ -1,7 +1,23 @@
+var http = require('http');
+var stati = require('node-static');
+var fileServer = new stati.Server('./client');
+var port = process.env.PORT || 8500;
+http.createServer(function (req, res) {
+    fileServer.serve(req, res);
+    if (req.url !== "/") {
+        // console.log('Page redirected to /');
+        // res.writeHead(302, {
+        //     location: "http://10.35.13.108:8000",
+        // });
+        // res.end();
+    }
+}).listen(port);
+console.log(`Http server running at http://10.35.13.108:${port}/`);
+
 const express = require("express");
 const cors = require("cors");
 const fs = require("fs");
-const appport = 8001;
+const appport = 8501;
 const app = express();
 const bodyParser = require("body-parser");
 const moment = require("moment");
@@ -27,6 +43,13 @@ app.use(express.static(path.join(__dirname, "static")));
 app.set("view engine", "pug");
 
 app.get("/", function (req, res) {
+    let ips = (
+        req.headers['cf-connecting-ip'] ||
+        req.headers['x-real-ip'] ||
+        req.headers['x-forwarded-for'] ||
+        req.connection.remoteAddress || ''
+    ).split(',');
+    console.log(ips[0].trim().split(':').pop());
   console.log(req.query);
 });
 
@@ -80,10 +103,12 @@ var variables = {
     WriteInts: 'DB200,INT14.4',
     Status: 'DB200,INT22.31',
     Alarms: 'DB200,X84.0.31',
+    Local_Mode: 'DB200,X88.0.3',
+    Driver_Speeds: 'DB200,INT90.4',
 };
 
 conn.initiateConnection({ port: 102, 
-    host: '192.168.1.21', 
+    host: '10.35.17.15', 
     rack: 0, 
     slot: 1, 
     debug: true 
@@ -94,7 +119,6 @@ let writeplcdata = {};
 
 app.post("/writePLCData", function (req, res) {
     writeplcdata = req.body;
-    console.log(doneWriting)
     if (doneWriting) {
         conn.writeItems('Bits', [
             writeplcdata.bools.bk1,
@@ -146,7 +170,6 @@ app.post("/writePLCData", function (req, res) {
 
 app.post("/writePLCDataInts", function (req, res) {
     writeplcdata = req.body;
-    console.log(doneWriting)
     if (doneWriting) {
         conn.writeItems('WriteInts', [
             writeplcdata.ints.bk1hertz,
@@ -172,7 +195,7 @@ function connected(err) {
     //   process.exit();
     }
     conn.setTranslationCB(function(tag) { return variables[tag]; }); // This sets the "translation" to allow us to work with object names
-    conn.addItems(['Bits', 'OnlyReadInts', 'WriteInts', 'Status', 'Alarms']);
+    conn.addItems(['Bits', 'OnlyReadInts', 'WriteInts', 'Status', 'Alarms', 'Local_Mode', 'Driver_Speeds']);
     conn.readAllItems(valuesReady);
 }
 
@@ -228,6 +251,8 @@ function valuesReady(err, values) {
         Connected: PLCconnected,
         Status: values.Status,
         Alarms: values.Alarms,
+        Local_Mode: values.Local_Mode,
+        Driver_Speeds: values.Driver_Speeds,
     };
     doneReading = true;
     // if (doneWriting) { conn.readAllItems(valuesReady); }

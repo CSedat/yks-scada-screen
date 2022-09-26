@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import axios from "axios";
 import moment from 'moment';
 import { DataGrid } from '@mui/x-data-grid';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-
+const ipadress = 'http://127.0.0.1:8501/';
 const theme = createTheme({
     palette: {
         primary: {
@@ -43,6 +43,8 @@ export default function SaveData() {
 
 function Table(props) {
     const [yerkantar, setKantar] = useState();
+    const kantarref = useRef();
+
     const [dara, setDara] = useState();
     const [rows, setRows] = useState([]);
     const [v1, setV1] = useState(0);
@@ -54,7 +56,7 @@ function Table(props) {
     function saveData() {
         moment.locale('tr');
         let id
-        axios.get(`http://127.0.0.1:8001/get${props.urun}`).then(response => {
+        axios.get(`${ipadress}get${props.urun}`).then(response => {
             let jsondata = response.data;
             if (jsondata.length > 0) {
                 id = jsondata.splice(0)[0].id + 1;
@@ -72,9 +74,10 @@ function Table(props) {
                 hour: moment().format('H:mm'),
 
             }
-            axios.post('http://127.0.0.1:8001/saveData', data).then(response => {
+            axios.post(`${ipadress}saveData`, data).then(response => {
                 console.log(response);
                 refreshData()
+                kantarref.current.value = '';
             }).catch(error => {
                 console.log(error);
             })
@@ -83,7 +86,7 @@ function Table(props) {
 
 
     function refreshData() {
-        axios.get(`http://127.0.0.1:8001/get${props.urun}`).then(response => {
+        axios.get(`${ipadress}get${props.urun}`).then(response => {
             let jsondata = response.data;
             let js = [];
             let oldv1 = 0
@@ -125,11 +128,12 @@ function Table(props) {
     }
     useEffect(() => {
         refreshData()
+        // eslint-disable-next-line
     }, [])
 
 
     useEffect(() => {
-        // axios.get(`http://127.0.0.1:8001/get${props.urun}`).then(response => {
+        // axios.get(`http://10.35.13.108:8001/get${props.urun}`).then(response => {
         //     let jsondata = response.data;
         //     let h = moment().format('H');
         //     for (let i = 0; i < jsondata.length; i++) {
@@ -146,6 +150,16 @@ function Table(props) {
 
 
     const columns = [
+        {
+            field: 'id',
+            headerName: 'No',
+            type: 'number',
+            editable: false,
+            headerAlign: 'center',
+            flex: 1,
+            align: 'center',
+            
+        },
         {
             field: 'kantar',
             headerName: 'Yer Kantarı',
@@ -206,7 +220,7 @@ function Table(props) {
                             id: cellValues.id,
                             urun: props.urun
                         }
-                        axios.post('http://127.0.0.1:8001/deleteData', data).then(response => {
+                        axios.post(`${ipadress}deleteData`, data).then(response => {
                             console.log(response);
                             refreshData()
                         }).catch(error => {
@@ -225,11 +239,20 @@ function Table(props) {
         <div className=' h-1/2   '>
             <ThemeProvider theme={theme}>
                 <div className=' text-white text-center bg-gray-800 rounded uppercase font-bold'>
-                        <h1>{props.name}</h1>
+                    <h1>{props.name}</h1>
                 </div>
-                <div className=' p-2 bg-gray-600 rounded grid grid-cols-3'>
+                <form action="" className=' p-2 bg-gray-600 rounded grid grid-cols-3' onSubmit={
+                    (e) => {
+                        e.preventDefault();
+                        if(yerkantar && dara) {
+                            saveData()
+                        } else {
+                            alert('Lütfen boş alanları doldurunuz')
+                        }
+                    }
+                }>
                     <div>
-                        <TextField id="outlined-basic" label="Yer Kantarı" variant="outlined" size='small' color="secondary" type={'number'} sx={{ input: { color: '#ffffff' }, width: '75%' }} focused
+                        <TextField id="outlined-basic" label="Yer Kantarı" inputRef={kantarref} variant="outlined" size='small' color="secondary" type={'number'} sx={{ input: { color: '#ffffff' }, width: '75%' }} focused
                             onChange={handleChangeYerkantar}
                         />
                     </div>
@@ -238,17 +261,9 @@ function Table(props) {
                             onChange={handleChangeDara}
                         />
                     </div>
-                    <Button style={{ width: '75%' }} variant="contained" color="success" onClick={() => {
-                        if(yerkantar && dara) {
-                            saveData()
-                        } else {
-                            alert('Lütfen boş alanları doldurunuz')
-                        }
-                    }}
-                    >Kaydet</Button>
+                    <Button type='submit' style={{ width: '75%' }} variant="contained" color="success">Kaydet</Button>
 
-                </div>
-
+                </form>
                 <div style={{ height: 300 }}>
                     <DataGrid 
                         // onCellEditCommit = {handleCommit}
@@ -260,6 +275,8 @@ function Table(props) {
                         experimentalFeatures={{ newEditingApi: true }}
                         rowHeight={35}
                         headerHeight={35}
+                        // pageSize = {5}
+                        
                         sx={{
                             color: '#ffffff',
                             boxShadow: 4,
@@ -268,11 +285,12 @@ function Table(props) {
                             '& .MuiDataGrid-cell:hover': {
                               color: 'yellow',
                             },
+                            
                         }}
                     />
                 </div>
                 
-                <div className=' bg-gray-600 rounded grid grid-cols-3 text-white p-2 text-center'>
+                <div className=' bg-gray-600 rounded over grid grid-cols-3 text-white p-2 text-center'>
                     <h1>V1 Toplam: {v1}</h1>
                     <h1>V2 Toplam: {v2}</h1>
                     <h1>V3 Toplam: {v3}</h1>
