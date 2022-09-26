@@ -5,7 +5,7 @@ import { DataGrid } from '@mui/x-data-grid';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-const ipadress = 'http://127.0.0.1:8501/';
+const ipadress = 'http://10.35.13.108:8501/';
 const theme = createTheme({
     palette: {
         primary: {

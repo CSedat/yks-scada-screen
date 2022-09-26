@@ -171,6 +171,8 @@ function Home() {
     const [bk3referans, setBk3referans] = useState(0);
     const [bk4referans, setBk4referans] = useState(0);
 
+    const [SystemOK, setSystemOK] = useState(false);
+
     useEffect(() => {
         axios.get(`${ipadress}getPLCData`).then(res => {
             let bb = res.data;
@@ -208,6 +210,7 @@ function Home() {
                     setBk2referans(res.data.Driver_Speeds[1])
                     setBk3referans(res.data.Driver_Speeds[2])
                     setBk4referans(res.data.Driver_Speeds[3])
+                    setSystemOK(res.data.Alarms[0])
                 }).catch(err => {
                     console.log(err)
                     serverconnectionok = false;
@@ -281,6 +284,7 @@ function Home() {
                     </div>
                     <button className=' bg-green-700 border hover:bg-green-900 border-white rounded flex justify-center' onClick={() => window.location.reload(false)}>BAĞLANTIYI YENILE   <HiRefresh size={25}/></button>
                     <button className=' bg-gray-700 border hover:bg-yellow-400 hover:scale-110 border-white rounded flex justify-center' onMouseDown={ FaultReset } onMouseUp={ FaultReset }>HATA RESET</button>
+                    {SystemOK ? <p className=' bg-green-500 rounded'>Sistem OK</p> : <p className=' bg-red-500 rounded'>Sistem Hata</p>}
                 </div>
             </div>
             <Stack className='absolute top-0 left-0 w-1/4 h-96  m-2'>

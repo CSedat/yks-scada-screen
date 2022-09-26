@@ -111,7 +111,7 @@ conn.initiateConnection({ port: 102,
     host: '10.35.17.15', 
     rack: 0, 
     slot: 1, 
-    debug: true 
+    debug: false 
 }, connected);
 
 var readplcdata = {};
