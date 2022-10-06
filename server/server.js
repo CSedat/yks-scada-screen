@@ -3,13 +3,16 @@ var stati = require('node-static');
 var fileServer = new stati.Server('./client');
 var port = process.env.PORT || 8500;
 http.createServer(function (req, res) {
-    fileServer.serve(req, res);
-    if (req.url !== "/") {
-        // console.log('Page redirected to /');
-        // res.writeHead(302, {
-        //     location: "http://10.35.13.108:8000",
-        // });
-        // res.end();
+    let ips = (
+    req.headers['cf-connecting-ip'] ||
+    req.headers['x-real-ip'] ||
+    req.headers['x-forwarded-for'] ||
+    req.connection.remoteAddress || '').split(',');
+    let ip = ips[0].trim().split(':').pop()
+    if (ip === '10.35.10.168'){
+      fileServer.serve(req, res);
+    }else{
+     console.log(`${ip} izinsiz giriş yapmaya çalıştı.`)
     }
 }).listen(port);
 console.log(`Http server running at http://10.35.13.108:${port}/`);
@@ -21,7 +24,6 @@ const appport = 8501;
 const app = express();
 const bodyParser = require("body-parser");
 const moment = require("moment");
-const XLSX = require("xlsx");
 const path = require("path");
 let PLCconnected = false;
 
@@ -43,13 +45,6 @@ app.use(express.static(path.join(__dirname, "static")));
 app.set("view engine", "pug");
 
 app.get("/", function (req, res) {
-    let ips = (
-        req.headers['cf-connecting-ip'] ||
-        req.headers['x-real-ip'] ||
-        req.headers['x-forwarded-for'] ||
-        req.connection.remoteAddress || ''
-    ).split(',');
-    console.log(ips[0].trim().split(':').pop());
   console.log(req.query);
 });
 
@@ -62,12 +57,10 @@ app.post("/saveData", function (req, res) {
   res.send("ok");
   res.end();
 });
-
 app.post("/deleteData", function (req, res) {
   console.log(req.body);
   var data = fs.readFileSync(`./data/${req.body.urun}.json`);
   var json = JSON.parse(data);
-
   for (let i = 0; i < json.length; i++) {
     const element = json[i];
     if (element.id == req.body.id) {
@@ -78,7 +71,6 @@ app.post("/deleteData", function (req, res) {
   res.send("ok");
   res.end();
 });
-
 app.get("/getceviz", function (req, res) {
   res.sendFile("./data/ceviz.json", { root: __dirname });
 });
@@ -91,12 +83,10 @@ app.get("/gettoz", function (req, res) {
 app.get("/getaraurun", function (req, res) {
   res.sendFile("./data/araurun.json", { root: __dirname });
 });
-
 var nodes7 = require('nodes7');
 var conn = new nodes7;
 var doneReading = false;
 var doneWriting = true;
-
 var variables = {
     Bits: 'DB200,X8.0.40',
     OnlyReadInts: 'DB200,INT0.4',
@@ -106,17 +96,14 @@ var variables = {
     Local_Mode: 'DB200,X88.0.3',
     Driver_Speeds: 'DB200,INT90.4',
 };
-
 conn.initiateConnection({ port: 102, 
     host: '10.35.17.15', 
     rack: 0, 
     slot: 1, 
-    debug: false 
+    debug: false
 }, connected);
-
 var readplcdata = {};
 let writeplcdata = {};
-
 app.post("/writePLCData", function (req, res) {
     writeplcdata = req.body;
     if (doneWriting) {
@@ -128,7 +115,6 @@ app.post("/writePLCData", function (req, res) {
             writeplcdata.bools.bk1manbantstp ,
             writeplcdata.bools.bk1manklpopen ,
             writeplcdata.bools.bk1manklpclose,
-
             writeplcdata.bools.bk2 ,
             writeplcdata.bools.bk2autostrt ,
             writeplcdata.bools.bk2autostp ,
@@ -136,7 +122,6 @@ app.post("/writePLCData", function (req, res) {
             writeplcdata.bools.bk2manbantstp ,
             writeplcdata.bools.bk2manklpopen ,
             writeplcdata.bools.bk2manklpclose,
-
             writeplcdata.bools.bk3,
             writeplcdata.bools.bk3autostrt,
             writeplcdata.bools.bk3autostp,
@@ -144,7 +129,6 @@ app.post("/writePLCData", function (req, res) {
             writeplcdata.bools.bk3manbantstp,
             writeplcdata.bools.bk3manklpopen,
             writeplcdata.bools.bk3manklpclose,
-
             writeplcdata.bools.bk4,
             writeplcdata.bools.bk4autostrt,
             writeplcdata.bools.bk4autostp,
@@ -152,11 +136,9 @@ app.post("/writePLCData", function (req, res) {
             writeplcdata.bools.bk4manbantstp,
             writeplcdata.bools.bk4manklpopen,
             writeplcdata.bools.bk4manklpclose,
-
             writeplcdata.bools.d709,
             writeplcdata.bools.d709start,
             writeplcdata.bools.d709stop,
-
             writeplcdata.bools.bell1,
             writeplcdata.bools.bell2,
             writeplcdata.bools.bell3,
@@ -167,7 +149,6 @@ app.post("/writePLCData", function (req, res) {
     res.send("ok");
     res.end();
 });
-
 app.post("/writePLCDataInts", function (req, res) {
     writeplcdata = req.body;
     if (doneWriting) {
@@ -178,17 +159,17 @@ app.post("/writePLCDataInts", function (req, res) {
             writeplcdata.ints.bk4hertz,
         ], valuesWritten);
     }
-        
+     
     res.send("ok");
     res.end();
 });
-
 app.get('/getPLCData', function (req, res) {
-    conn.readAllItems(valuesReady);
+    if(doneReading){
+        conn.readAllItems(valuesReady);
+    }
     res.send(readplcdata);
-    
+ 
 });
-
 function connected(err) {
     if (typeof(err) !== "undefined") {
       console.log(err);
@@ -196,9 +177,9 @@ function connected(err) {
     }
     conn.setTranslationCB(function(tag) { return variables[tag]; }); // This sets the "translation" to allow us to work with object names
     conn.addItems(['Bits', 'OnlyReadInts', 'WriteInts', 'Status', 'Alarms', 'Local_Mode', 'Driver_Speeds']);
+    console.log('Connected to PLC');
     conn.readAllItems(valuesReady);
 }
-
 function valuesReady(err, values) {
     if (err) { console.log("PLC Bağlantısı kopuk yada değerler yanlış!!!!"); PLCconnected = false;}else{PLCconnected = true;}
     readplcdata = {
@@ -247,7 +228,7 @@ function valuesReady(err, values) {
             Bk3Hertz: values.WriteInts[2],
             Bk4Hertz: values.WriteInts[3],
         },
-        
+     
         Connected: PLCconnected,
         Status: values.Status,
         Alarms: values.Alarms,
@@ -257,11 +238,79 @@ function valuesReady(err, values) {
     doneReading = true;
     // if (doneWriting) { conn.readAllItems(valuesReady); }
 }
-
 function valuesWritten(err) {
   if (err) { console.log("PLC Bağlantısı kopuk yada değerler yanlış!!!!"); }
   console.log("Yazıldı.");
   doneWriting = true;
 }
+
+function SaveTotal(vardiya, urun) {
+    fs.readFile(`./data/${urun}.json`, null, function (error, data) {
+        if (error) {  console.log(error); }
+        var jsondata = JSON.parse(data)
+        let total = 0;
+        for (let i = 0; i < jsondata.length; i++) {
+            let d = jsondata[i].date.split('/')[0]
+            let h = jsondata[i].hour.split(':')[0]
+            let nowd = moment().format('DD')
+            if (Number(d) == Number(nowd)) { 
+                let net = parseInt(jsondata[i].kantar - jsondata[i].dara)
+                if (h >= 0 && h <= 7) {
+                    total += net
+                } else if (h >= 8 && h <= 15) {
+                    total += net
+                } else if (h >= 16 && h <= 23) {
+                    total += net
+                }
+            }
+        }
+
+        jsondata.unshift({
+            id: jsondata.slice(0, 1)[0].id+1,
+            kantar: vardiya,
+            dara: 'Toplam Net',
+            net: total,
+            date: moment().format('DD/MM/YY'),
+            hour: moment().format('H:mm'),
+        });
+
+
+        fs.writeFile(`./data/${urun}.json`, JSON.stringify(jsondata), err => {
+            if (err) throw err;
+            console.log(`${urun} Total saved!`);
+        });
+    });
+}
+
+setInterval(() => {
+    var ss = moment().format('H');
+    var mm = moment().format('mm');
+    if (ss == 23 && mm == 59) {
+        SaveTotal('V1', 'araurun')
+        SaveTotal('V1', 'ceviz')
+        SaveTotal('V1', 'findik')
+        SaveTotal('V1', 'toz')
+    } else if (ss == 7 && mm == 59) {
+        SaveTotal('V2', 'araurun')
+        SaveTotal('V2', 'ceviz')
+        SaveTotal('V2', 'findik')
+        SaveTotal('V2', 'toz')
+    } else if (ss == 15 && mm == 59) {
+        SaveTotal('V2', 'araurun')
+        SaveTotal('V2', 'ceviz')
+        SaveTotal('V2', 'findik')
+        SaveTotal('V2', 'toz')
+    }
+        // for (var k in Obj) {
+        // var ob = Obj[k];
+        // var now = moment().unix();
+        // var endTime = ob.timestamp;
+
+        // if (now > endTime + 3600*12) {
+        // Obj.splice(k,1);
+        // }
+        // }
+
+}, 60000);
 
 
