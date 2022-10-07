@@ -16,7 +16,7 @@ http.createServer(function (req, res) {
     }
 }).listen(port);
 console.log(`Http server running at http://10.35.13.108:${port}/`);
-
+//ip === '10.35.10.168'
 const express = require("express");
 const cors = require("cors");
 const fs = require("fs");
@@ -268,12 +268,12 @@ function SaveTotal(vardiya, urun) {
         console.log(total)
         jsondata.unshift({
             id: jsondata.slice(0, 1)[0].id+1,
-            kantar: vardiya,
-            dara: 'Toplam Net',
-            net: total,
+            kantar: `${vardiya} Toplam Net`,
+            dara: total,
             date: moment().format('DD/MM/YY'),
             hour: moment().format('H:mm'),
         });
+        console.log(jsondata)
 
         fs.writeFile(`./data/${urun}.json`, JSON.stringify(jsondata), err => {
             if (err) throw err;
