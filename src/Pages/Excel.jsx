@@ -106,16 +106,17 @@ function Table(props) {
                 let nowd = moment().format('DD')
                 if (d === nowd) { 
                     let net = parseInt(jsondata[i].kantar - jsondata[i].dara)
-                    console.log(net)
-                    if (h >= 0 && h <= 7) {
-                        oldv1 += net
-                        setV1(oldv1)
-                    } else if (h >= 8 && h <= 15) {
-                        oldv2 += net
-                        setV2(oldv2)
-                    } else if (h >= 16 && h <= 23) {
-                        oldv3 += net
-                        setV3(oldv3)
+                    if(jsondata[i].kantar.search('V')){
+                        if (h >= 0 && h <= 7) {
+                            oldv1 += net
+                            setV1(oldv1)
+                        } else if (h >= 8 && h <= 15) {
+                            oldv2 += net
+                            setV2(oldv2)
+                        } else if (h >= 16 && h <= 23) {
+                            oldv3 += net
+                            setV3(oldv3)
+                        }
                     }
                 }
 
