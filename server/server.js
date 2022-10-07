@@ -273,7 +273,6 @@ function SaveTotal(vardiya, urun) {
             date: moment().format('DD/MM/YY'),
             hour: moment().format('H:mm'),
         });
-        console.log(jsondata)
 
         fs.writeFile(`./data/${urun}.json`, JSON.stringify(jsondata), err => {
             if (err) throw err;
