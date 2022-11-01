@@ -87,7 +87,7 @@ function Table(props) {
 
     function refreshData() {
         axios.get(`${ipadress}get${props.urun}`).then(response => {
-            let jsondata = response.data;
+            let jsondata = response.data.slice(0, 30);
             let js = [];
             let oldv1 = 0
             let oldv2 = 0
