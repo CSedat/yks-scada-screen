@@ -240,10 +240,6 @@ function valuesWritten(err) {
   console.log("Yazıldı.");
   doneWriting = true;
 }
-SaveTotal('V1', 'araurun')
-        SaveTotal('V1', 'ceviz')
-        SaveTotal('V1', 'findik')
-        SaveTotal('V1', 'toz')
 
 function SaveTotal(vardiya, urun) {
     fs.readFile(`./data/${urun}.json`, null, function (error, data) {
