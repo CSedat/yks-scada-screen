@@ -240,11 +240,15 @@ function valuesWritten(err) {
   console.log("Yazıldı.");
   doneWriting = true;
 }
+SaveTotal('V1', 'araurun')
+        SaveTotal('V1', 'ceviz')
+        SaveTotal('V1', 'findik')
+        SaveTotal('V1', 'toz')
 
 function SaveTotal(vardiya, urun) {
     fs.readFile(`./data/${urun}.json`, null, function (error, data) {
         if (error) {  console.log(error); }
-        var jsondata = JSON.parse(data)
+        var jsondata = JSON.parse(data).slice(0, 30)
         let total = 0;
         for (let i = 0; i < jsondata.length; i++) {
             let d = jsondata[i].date.split('/')[0]
