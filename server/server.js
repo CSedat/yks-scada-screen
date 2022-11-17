@@ -294,10 +294,10 @@ setInterval(() => {
         SaveTotal('V2', 'findik')
         SaveTotal('V2', 'toz')
     } else if (ss == 15 && mm == 59) {
-        SaveTotal('V2', 'araurun')
-        SaveTotal('V2', 'ceviz')
-        SaveTotal('V2', 'findik')
-        SaveTotal('V2', 'toz')
+        SaveTotal('V3', 'araurun')
+        SaveTotal('V3', 'ceviz')
+        SaveTotal('V3', 'findik')
+        SaveTotal('V3', 'toz')
     }
         // for (var k in Obj) {
         // var ob = Obj[k];
