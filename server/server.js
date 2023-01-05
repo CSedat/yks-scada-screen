@@ -284,20 +284,20 @@ setInterval(() => {
     var ss = moment().format('H');
     var mm = moment().format('mm');
     if (ss == 23 && mm == 59) {
-        SaveTotal('V1', 'araurun')
-        SaveTotal('V1', 'ceviz')
-        SaveTotal('V1', 'findik')
-        SaveTotal('V1', 'toz')
-    } else if (ss == 7 && mm == 59) {
-        SaveTotal('V2', 'araurun')
-        SaveTotal('V2', 'ceviz')
-        SaveTotal('V2', 'findik')
-        SaveTotal('V2', 'toz')
-    } else if (ss == 15 && mm == 59) {
         SaveTotal('V3', 'araurun')
         SaveTotal('V3', 'ceviz')
         SaveTotal('V3', 'findik')
         SaveTotal('V3', 'toz')
+    } else if (ss == 7 && mm == 59) {
+        SaveTotal('V1', 'araurun')
+        SaveTotal('V1', 'ceviz')
+        SaveTotal('V1', 'findik')
+        SaveTotal('V1', 'toz')
+    } else if (ss == 15 && mm == 59) {
+        SaveTotal('V2', 'araurun')
+        SaveTotal('V2', 'ceviz')
+        SaveTotal('V2', 'findik')
+        SaveTotal('V2', 'toz')
     }
         // for (var k in Obj) {
         // var ob = Obj[k];
