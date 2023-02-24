@@ -1,4 +1,4 @@
-var http = require('http');
+﻿var http = require('http');
 var stati = require('node-static');
 var fileServer = new stati.Server('./client');
 var port = process.env.PORT || 8500;
@@ -244,38 +244,50 @@ function valuesWritten(err) {
 function SaveTotal(vardiya, urun) {
     fs.readFile(`./data/${urun}.json`, null, function (error, data) {
         if (error) {  console.log(error); }
-        var jsondata = JSON.parse(data).slice(0, 30)
-        let total = 0;
+        var jsondata = JSON.parse(data);
+        let v1Total = 0;
+        let v2Total = 0;
+        let v3Total = 0;
         for (let i = 0; i < jsondata.length; i++) {
             let d = jsondata[i].date.split('/')[0]
+            let m = jsondata[i].date.split('/')[1]
             let h = jsondata[i].hour.split(':')[0]
             let nowd = moment().format('DD')
-            if (Number(d) == Number(nowd)) { 
+            let nowm = moment().format('MM')
+            if (Number(d) == Number(nowd) && Number(m) == Number(nowm)) { 
                 if(jsondata[i].kantar.search('V')){
                     let net = parseInt(jsondata[i].kantar - jsondata[i].dara)
                     if (h >= 0 && h <= 7) {
-                        total += net
+                        v1Total += net
                     } else if (h >= 8 && h <= 15) {
-                        total += net
+                        v2Total += net
                     } else if (h >= 16 && h <= 23) {
-                        total += net
+                        v3Total += net
                     }
                 }
             }
         }
-        
-        console.log(total)
+
+        let currentTotal = 0;
+        if (vardiya === "V1") {
+            currentTotal = v1Total;
+        } else if (vardiya === "V2") {
+            currentTotal = v2Total;
+        } else if (vardiya === "V3") {
+            currentTotal = v3Total;
+        }
+
         jsondata.unshift({
-            id: jsondata.slice(0, 1)[0].id+1,
+            id: jsondata.slice(0, 1)[0].id + 1,
             kantar: `${vardiya} Toplam Net`,
-            dara: total,
+            dara: currentTotal,
             date: moment().format('DD/MM/YY'),
             hour: moment().format('H:mm'),
         });
 
         fs.writeFile(`./data/${urun}.json`, JSON.stringify(jsondata), err => {
             if (err) throw err;
-            console.log(`${urun} Total saved!`);
+            console.log(`Total saved!`);
         });
     });
 }
