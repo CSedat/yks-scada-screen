@@ -16,6 +16,7 @@
     "fs": "^0.0.1-security",
     "http": "^0.0.1-security",
     "moment": "^2.29.4",
+    "mongoose": "^7.2.2",
     "node-static": "^0.7.11",
     "nodemon": "^2.0.19",
     "nodes7": "^0.3.18",

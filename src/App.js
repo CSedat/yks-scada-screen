@@ -12,7 +12,7 @@ function App() {
   }, []);
 
   return (
-    <div className="App transition-all select-none h-screen bg-gradient-to-r from-cyan-700 to-blue-900 items-center justfliy-center">
+    <div className="App transition-all select-none h-screen bg-gradient-to-r from-gray-700 to-gray-900 items-center justfliy-center">
       <Routes>
         {routes.map((r) => (
           <Route path={r.path} element={r.component} />

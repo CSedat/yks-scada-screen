@@ -5,7 +5,8 @@ import { DataGrid } from '@mui/x-data-grid';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-const ipadress = 'http://10.35.13.108:8501/';
+import { Typography } from '@mui/material';
+
 const theme = createTheme({
     palette: {
         primary: {
@@ -22,19 +23,47 @@ const theme = createTheme({
 });
 
 export default function SaveData() {
+    const [yerkantar, setKantar] = useState(0);
+
+    const refreshKantarData = () => {
+        axios.get('http://10.35.13.108:80/api/GetYksPDCValue').then((response) => {
+            let jsondata = response.data.value;
+            setKantar(jsondata);
+        }).catch((error) => {
+            console.log(error);
+        });
+    }
+
+    useEffect(() => {
+        refreshKantarData()
+        const timer = setInterval(() => {
+            try {
+                refreshKantarData()
+            } catch (error) {
+                console.log(error)
+            }
+        }, 500);
+        return () => {
+            clearInterval(timer);
+        };
+    }, [])
     return (
         <div >
             <div className='absolute top-2 left-2'>
-                <Table urun='araurun' name='Araürün' />
+                <Table urun='araurun' name='Araürün' yerkantar={yerkantar} />
             </div>
             <div className='absolute top-2 right-2'>
-                <Table urun='toz' name='Toz' />
+                <Table urun='toz' name='Toz' yerkantar={yerkantar} />
             </div>
             <div className='absolute bottom-20 left-2'>
-                <Table urun='findik' name='Fındık' />
+                <Table urun='findik' name='Fındık' yerkantar={yerkantar} />
             </div>
             <div className='absolute bottom-20 right-2'>
-                <Table urun='ceviz' name='Ceviz' />
+                <Table urun='ceviz' name='Ceviz' yerkantar={yerkantar} />
+            </div>
+            <div className='absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-72  bg-gray-500 rounded'>
+                <Typography sx={{ textAlign: 'center', p: 1 }} color='white'>YER KANTARI ANLIK DEĞER</Typography>
+                <Typography sx={{ textAlign: 'center', p: 1 }} variant='h3' color='white'>{yerkantar} kg</Typography>
             </div>
         </div>
     );
@@ -42,199 +71,119 @@ export default function SaveData() {
 
 
 function Table(props) {
-    const [yerkantar, setKantar] = useState();
-    const kantarref = useRef();
-
     const [dara, setDara] = useState();
     const [rows, setRows] = useState([]);
     const [v1, setV1] = useState(0);
     const [v2, setV2] = useState(0);
     const [v3, setV3] = useState(0);
-    const handleChangeYerkantar = (event) => setKantar(event.target.value);
     const handleChangeDara = (event) => setDara(event.target.value);
-    
-    function saveData() {
+
+    async function saveData() {
         moment.locale('tr');
-        let id
-        axios.get(`${ipadress}get${props.urun}`).then(response => {
-            let jsondata = response.data;
-            if (jsondata.length > 0) {
-                id = jsondata.splice(0)[0].id + 1;
-            }else{
-                id = 1
-            }
-
+        await axios.post('http://10.35.13.108:80/api/saveYKSData', {
+            kantar: props.yerkantar,
+            dara: dara,
+            urun: props.urun,
         }).then(response => {
-            let data = {
-                id: id,
-                kantar: yerkantar,
-                dara: dara,
-                urun: props.urun,
-                date: moment().format('DD/MM/YY'),
-                hour: moment().format('H:mm'),
-
-            }
-            axios.post(`${ipadress}saveData`, data).then(response => {
-                console.log(response);
-                refreshData()
-                kantarref.current.value = '';
-            }).catch(error => {
-                console.log(error);
-            })
+            refreshData()
+        }).catch(error => {
+            console.log(error);
         });
-    };  
+    };
 
+    useEffect(() => {
+        const storedDara = localStorage.getItem(`${props.urun}Dara`);
+        if (storedDara) {
+            setDara(storedDara);
+        }
+    }, []);
+
+    useEffect(() => {
+        if (dara) {
+            localStorage.setItem(`${props.urun}Dara`, dara);
+        }
+    }, [dara]);
 
     function refreshData() {
-        axios.get(`${ipadress}get${props.urun}`).then(response => {
-            let jsondata = response.data.slice(0, 30);
-            let js = [];
-            let oldv1 = 0
-            let oldv2 = 0
-            let oldv3 = 0;
-            for (let i = 0; i < jsondata.length; i++) {
-                js.push({
-                    id: jsondata[i].id,
-                    kantar: jsondata[i].kantar,
-                    dara: jsondata[i].dara,
-                    net: jsondata[i].kantar - jsondata[i].dara,
-                    date: jsondata[i].date,
-                    hour: jsondata[i].hour
-                });
-                let d = jsondata[i].date.split('/')[0]
-                let h = jsondata[i].hour.split(':')[0]
-                let nowd = moment().format('DD')
-                if (d === nowd) { 
-                    let net = parseInt(jsondata[i].kantar - jsondata[i].dara)
-                    if(jsondata[i].kantar.search('V')){
-                        if (h >= 0 && h <= 7) {
-                            oldv1 += net
-                            setV1(oldv1)
-                        } else if (h >= 8 && h <= 15) {
-                            oldv2 += net
-                            setV2(oldv2)
-                        } else if (h >= 16 && h <= 23) {
-                            oldv3 += net
-                            setV3(oldv3)
+        return new Promise((resolve, reject) => {
+            axios.post(`http://10.35.13.108:80/api/getYksData`, { limit: 50, urun: props.urun }).then((response) => {
+                let jsondata = response.data;
+                let row = [];
+                let v1Total = 0;
+                let v2Total = 0;
+                let v3Total = 0;
+                for (let i = 0; i < jsondata.length; i++) {
+                    row.push({ ...jsondata[i] });
+                    let d = jsondata[i].date.split('/')[0];
+                    let m = jsondata[i].date.split('/')[1];
+                    let h = jsondata[i].hour.split(':')[0];
+                    let nowd = moment().format('DD');
+                    let nowm = moment().format('MM');
+                    if (Number(d) === Number(nowd) && Number(m) === Number(nowm)) {
+                        if (jsondata[i].kantar.search('V')) {
+                            let net = parseInt(jsondata[i].kantar - jsondata[i].dara);
+                            if (h >= 0 && h <= 7) {
+                                v1Total += net;
+                            } else if (h >= 8 && h <= 15) {
+                                v2Total += net;
+                            } else if (h >= 16 && h <= 23) {
+                                v3Total += net;
+                            }
                         }
                     }
                 }
-
-            }
-            setRows(js);
-
-        }).catch(error => {
-            console.log(error);
-        })
+                setRows(row);
+                setV1(Number(v1Total / 1000).toFixed(2));
+                setV2(Number(v2Total / 1000).toFixed(2));
+                setV3(Number(v3Total / 1000).toFixed(2));
+                resolve({ row, v1Total, v2Total, v3Total });
+            }).catch((error) => {
+                console.log(error);
+                reject(error);
+            });
+        });
     }
+
     useEffect(() => {
         refreshData()
         // eslint-disable-next-line
     }, [])
 
-
-    useEffect(() => {
-        // axios.get(`http://10.35.13.108:8001/get${props.urun}`).then(response => {
-        //     let jsondata = response.data;
-        //     let h = moment().format('H');
-        //     for (let i = 0; i < jsondata.length; i++) {
-        //         let net = response.data[i].kantar - response.data[i].dara;
-        //         totalnet += net;
-        //     }
-        //     setV1(totalnet);
-
-         
-        // }).catch(error => {
-        //     console.log(error);
-        // })
-    },)
-
-
     const columns = [
-        {
-            field: 'id',
-            headerName: 'No',
-            type: 'number',
-            editable: false,
-            headerAlign: 'center',
-            flex: 1,
-            align: 'center',
-            
-        },
-        {
-            field: 'kantar',
-            headerName: 'Yer Kantarı',
-            type: 'number',
-            editable: true,
-            headerAlign: 'center',
-            flex: 1,
-            align: 'center',
-            
-        },
-        {
-            field: 'dara',
-            headerName: 'Dara',
-            type: 'number',
-            editable: true,
-            headerAlign: 'center',
-            flex: 1,
-            align: 'center',
-        },
-        {
-            field: 'net',
-            headerName: 'Net',
-            type: 'number',
-            editable: true,
-            headerAlign: 'center',
-            flex: 1,
-            align: 'center',
-        },
-        {
-            field: 'hour',
-            headerName: 'Kayıt Saati',
-            headerAlign: 'center',
-            editable: false,
-            flex: 1,
-            align: 'center',
-        },
-        {
-            field: 'date',
-            headerName: 'Kayıt Tarihi',
-            headerAlign: 'center',
-            editable: false,
-            flex: 1,
-            align: 'center',
-        },
+        { field: 'date', headerName: 'Kayıt Tarihi', headerAlign: 'center', flex: 1, align: 'center' },
+        { field: 'hour', headerName: 'Kayıt Saati', headerAlign: 'center', flex: 1, align: 'center' },
+        { field: 'vardiya', headerName: 'Vardiya', headerAlign: 'center', flex: 1, align: 'center' },
+        { field: 'kantar', headerName: 'Yer Kantarı', headerAlign: 'center', flex: 1, align: 'center' },
+        { field: 'dara', headerName: 'Dara', headerAlign: 'center', flex: 1, align: 'center' },
+        { field: 'net', headerName: 'Net', headerAlign: 'center', flex: 1, align: 'center' },
         {
             field: "Sil",
             headerAlign: 'center',
-            
+
             align: 'center',
             renderCell: (cellValues) => {
-              return (
-                <Button
-                  variant="contained"
-                    color="warning"
-                    onClick={() => {
-                        console.log(cellValues.id)
-                        let data = {
-                            id: cellValues.id,
-                            urun: props.urun
+                return (
+                    <Button
+                        variant="contained"
+                        color="warning"
+                        onClick={() => {
+                            axios.post(`http://10.35.13.108/api/deleteYKSData`, {
+                                _id: cellValues.row._id,
+                                urun: props.urun
+                            }).then(response => {
+                                console.log(response);
+                                refreshData()
+                            }).catch(error => {
+                                console.log(error);
+                            })
                         }
-                        axios.post(`${ipadress}deleteData`, data).then(response => {
-                            console.log(response);
-                            refreshData()
-                        }).catch(error => {
-                            console.log(error);
-                        })
-                    }
-                }
-                >
-                  Sil
-                </Button>
-              );
+                        }
+                    >
+                        Sil
+                    </Button>
+                );
             }
-          },
+        },
     ];
     return (
         <div className=' h-1/2   '>
@@ -245,7 +194,7 @@ function Table(props) {
                 <form action="" className=' p-2 bg-gray-600 rounded grid grid-cols-3' onSubmit={
                     (e) => {
                         e.preventDefault();
-                        if(yerkantar && dara) {
+                        if (dara) {
                             saveData()
                         } else {
                             alert('Lütfen boş alanları doldurunuz')
@@ -253,20 +202,27 @@ function Table(props) {
                     }
                 }>
                     <div>
-                        <TextField id="outlined-basic" label="Yer Kantarı" inputRef={kantarref} variant="outlined" size='small' color="secondary" type={'number'} sx={{ input: { color: '#ffffff' }, width: '75%' }} focused
-                            onChange={handleChangeYerkantar}
-                        />
+                        <TextField id="outlined-basic" label="Yer Kantarı" value={props.yerkantar} variant="outlined" size='small' color="secondary" type={'number'} sx={{ input: { color: '#ffffff' }, width: '75%' }} focused/>
                     </div>
                     <div>
-                        <TextField id="outlined-basic" label="Dara" variant="outlined" size='small' color="secondary" type={'number'} sx={{ input: { color: '#ffffff' }, width: '75%' }} focused
+                        <TextField
+                            id="outlined-basic"
+                            label="Dara"
+                            variant="outlined"
+                            size='small'
+                            color="secondary"
+                            type={'number'}
+                            sx={{ input: { color: '#ffffff' }, width: '75%' }}
+                            focused
                             onChange={handleChangeDara}
+                            value={dara}
                         />
                     </div>
                     <Button type='submit' style={{ width: '75%' }} variant="contained" color="success">Kaydet</Button>
 
                 </form>
                 <div style={{ height: 300 }}>
-                    <DataGrid 
+                    <DataGrid
                         // onCellEditCommit = {handleCommit}
                         columns={columns}
                         rows={rows}
@@ -277,20 +233,20 @@ function Table(props) {
                         rowHeight={35}
                         headerHeight={35}
                         // pageSize = {5}
-                        
+
                         sx={{
                             color: '#ffffff',
                             boxShadow: 4,
                             border: 1,
                             borderColor: '#ffffff',
                             '& .MuiDataGrid-cell:hover': {
-                              color: 'yellow',
+                                color: 'yellow',
                             },
-                            
+
                         }}
                     />
                 </div>
-                
+
                 <div className=' bg-gray-600 rounded over grid grid-cols-3 text-white p-2 text-center'>
                     <h1>V1 Toplam: {v1}</h1>
                     <h1>V2 Toplam: {v2}</h1>
