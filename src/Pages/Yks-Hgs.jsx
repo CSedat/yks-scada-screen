@@ -131,7 +131,7 @@ const YKS = () => {
 
   function fetchData(urun, limit) {
     return new Promise((resolve, reject) => {
-      axios.post(`http://10.35.13.108:80/api/getYksData`, { limit, urun }).then((response) => {
+      axios.post(`https://lavvar.polyakeynez.com/api/getYksData`, { limit, urun }).then((response) => {
         let jsondata = response.data;
         let row = [];
         let v1Total = 0;
@@ -202,7 +202,7 @@ const YKS = () => {
       console.log(error);
     });
 
-    axios.get(`http://10.35.13.108:80/api/GetHGSTableData`).then(async (response) => {
+    axios.get(`https://lavvar.polyakeynez.com/api/GetHGSTableData`).then(async (response) => {
       let data = await response.data.map(item => {
         let [tarih, saat] = item["KantarSaati"].trim().split(' ');
         return {
